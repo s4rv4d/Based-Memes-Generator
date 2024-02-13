@@ -12,6 +12,14 @@ const config: Config = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "radial-at-tl": `radial-gradient(at top left, #03FF7080, #DC80FC00, transparent)`,
+        "radial-at-br": `radial-gradient(at bottom right, ##03FF7080, #DC80FC00, transparent)`,
+      },
+      colors: {
+        "custom-green": "#03FF7080",
+        "custom-black": "#1C1C1C", // Use your own color hex code
+        "create-form-bg": "#323232",
+        "new-create-bg": "#525252",
       },
     },
   },

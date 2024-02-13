@@ -16,7 +16,7 @@
   }
 }
 
-body {
+/* body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
@@ -24,6 +24,10 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+} */
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color: #1c1c1c; /* Semi-transparent using alpha value 80 (approximately 50% opacity) */
 }
 
 @layer utilities {
@@ -31,3 +35,15 @@ body {
     text-wrap: balance;
   }
 }
+/* body {
+  color: rgb(var(--foreground-rgb));
+  background-color: #dc80fc00;
+  /* background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb)); */
+/* } */
+
+/* 29272900 */
