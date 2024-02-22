@@ -1,5 +1,5 @@
 import { cookieStorage, createStorage, createConfig, http } from "wagmi";
-import { baseGoerli } from "wagmi/chains";
+import { base, goerli } from "wagmi/chains";
 import { injected, walletConnect } from "wagmi/connectors";
 
 export const projectId = "57e7b95b6fe2e9186cd0caf2eaaa68e9";
@@ -7,7 +7,7 @@ export const projectId = "57e7b95b6fe2e9186cd0caf2eaaa68e9";
 if (!projectId) throw new Error("Project ID is not defined");
 
 export const config = createConfig({
-  chains: [baseGoerli],
+  chains: [goerli],
   connectors: [
     injected(),
     walletConnect({
@@ -20,6 +20,6 @@ export const config = createConfig({
     storage: cookieStorage,
   }),
   transports: {
-    [baseGoerli.id]: http(),
+    [goerli.id]: http(),
   },
 });

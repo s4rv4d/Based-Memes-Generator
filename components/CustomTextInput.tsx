@@ -1,3 +1,4 @@
+import { color } from "html2canvas/dist/types/css/types/color";
 import React from "react";
 
 interface CustomTextInputProps {
@@ -29,18 +30,29 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
   };
 
   const inputStyle: React.CSSProperties = {
-    padding: "8px",
+    // paddingLeft: "8px",
     color: "#FFFFFF",
-    height: "64px",
-    background: "#424242",
+    height: "40px",
+    background: "#525252",
+    borderRadius: "4px",
   };
 
   const editInputStyle: React.CSSProperties = {
     padding: "8px",
     color: "#FFFFFF",
-    height: "64px",
-    width: "100px",
+    height: "40px",
+    width: "40px",
+    background: "#525252",
+    borderRadius: "4px",
+  };
+
+  const labelStackStyle: React.CSSProperties = {
+    flexDirection: "column",
     background: "#424242",
+    display: "flex",
+    // paddingRight: "8px",
+    margin: 0,
+    gap: 4,
   };
 
   return (
@@ -48,34 +60,72 @@ const CustomTextInput: React.FC<CustomTextInputProps> = ({
       <div
         style={{
           display: "flex",
-          alignItems: "center",
-          backgroundColor: "#f9f9f9",
+          flexDirection: "row",
+          justifyContent: "center",
+          gap: 8,
         }}
       >
-        <input
-          type="text"
-          value={text}
-          style={{ ...inputStyle, width: "100%" }}
-          onChange={(e) => onTextChange(e.target.value)}
-        />
-        <input
-          type="color"
-          value={style.color}
-          style={{
-            ...editInputStyle,
-          }}
-          onChange={(e) => onStyleChange({ ...style, color: e.target.value })}
-        />
-        <input
-          type="number"
-          value={parseInt(style.fontSize, 10)}
-          style={{
-            ...editInputStyle,
-          }}
-          onChange={(e) =>
-            onStyleChange({ ...style, fontSize: `${e.target.value}` })
-          }
-        />
+        {/* Text Input Label and Input */}
+        <div style={labelStackStyle}>
+          <label
+            style={{
+              color: "white",
+              // marginBlockStart: "2px",
+              fontSize: "10px",
+            }}
+          >
+            Text
+          </label>
+          <input
+            type="text"
+            value={text}
+            style={{ ...inputStyle, width: "100%" }}
+            onChange={(e) => onTextChange(e.target.value)}
+          />
+        </div>
+
+        <div style={labelStackStyle}>
+          <label
+            style={{
+              color: "white",
+              marginBlockStart: "2px",
+              fontSize: "10px",
+            }}
+          >
+            Color
+          </label>
+          <input
+            type="color"
+            value={style.color}
+            style={{
+              ...editInputStyle,
+            }}
+            onChange={(e) => onStyleChange({ ...style, color: e.target.value })}
+          />
+        </div>
+
+        <div style={labelStackStyle}>
+          <label
+            style={{
+              color: "white",
+              marginBlockStart: "2px",
+              fontSize: "10px",
+            }}
+          >
+            Font Size
+          </label>
+          <input
+            type="number"
+            value={parseInt(style.fontSize, 10)}
+            style={{
+              ...editInputStyle,
+            }}
+            onChange={
+              (e) =>
+                onStyleChange({ ...style, fontSize: `${e.target.value}px` }) // Ensure unit is included for fontSize
+            }
+          />
+        </div>
       </div>
     </div>
   );

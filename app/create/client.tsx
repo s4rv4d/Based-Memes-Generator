@@ -1,17 +1,17 @@
 "use client";
 import { useState, useRef } from "react";
-import Draggable from "react-draggable";
-import { Resizable } from "react-resizable";
 import html2canvas from "html2canvas";
-import { blob } from "stream/consumers";
 import { ZoraAbi, getContractFromChainId } from "../../abi/zoraEdition";
-import { z } from "zod";
-import { Decimal } from "decimal.js";
-import { useSimulateContract, useWriteContract } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import ImageCarousel from "@/components/imageCarousel";
 import "./resizalble-style.css";
 import TextOverlay from "@/components/TextOverlay";
 import CustomTextInput from "@/components/CustomTextInput";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { useAccount } from "wagmi";
+import { useEffect } from "react";
+import Loader from "@/components/loader";
 
 import {
   flattenContractArgs,
@@ -21,33 +21,17 @@ import {
 
 export const CreatePost = () => {
   const [imageSrc, setImageSrc] = useState(null); // To store the uploaded image source
-  const [topText, setTopText] = useState(""); // To store the top text
-  const [bottomText, setBottomText] = useState(""); // To store the bottom text
-  const [bounds, setBounds] = useState({
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  });
-  const [resizeFirstBounds, setResizeFirstBounds] = useState({
-    width: 200,
-    height: 200,
-  });
-  const [resizeSecondBounds, setResizeSecondBounds] = useState({
-    width: 200,
-    height: 200,
-  });
-  // const [file, setFile] = useState(new Blob());
   const [file, setFile] = useState<File | null>(null);
   const [cid, setCid] = useState("");
   const [form, setForm] = useState({
     name: "",
     description: "",
   });
-  const [editionSlot, setEditionSlot] = useState<number | null>(null);
+  const [args, setArgs] = useState<any[] | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("Loading...");
 
-  // TESTING TEXT OVERLAY
-  // const [texts, setTexts] = useState([{ id: 1, text: "Test", x: 50, y: 50 }]);
   const [texts, setTexts] = useState([
     {
       id: 1,
@@ -90,13 +74,6 @@ export const CreatePost = () => {
     setTexts(updatedTexts);
   };
 
-  // const updateText = (id, newText) => {
-  //   const updatedTexts = texts.map((text) =>
-  //     text.id === id ? { ...text, text: newText } : text
-  //   );
-  //   setTexts(updatedTexts);
-  // };
-
   // Function to handle image file upload
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -110,6 +87,7 @@ export const CreatePost = () => {
   const handleCarouselSelection = ({ index }: { index: number }) => {
     const file = imageArray[index];
     setImageSrc(file);
+    setSelectedIndex(index);
   };
 
   // On top layout
@@ -121,21 +99,22 @@ export const CreatePost = () => {
   };
 
   const uploadFile = async (formData: FormData) => {
+    setLoadingText("Uploading to IPFS.....");
+
     try {
       const res = await fetch("/api/files", {
         method: "POST",
         body: formData,
       });
-      // const resp = await res.text();
+
       const ipfsHash = await res.text();
-      console.log("ipfs hash ", ipfsHash);
       setCid(ipfsHash);
-      // setUploading(false);
 
       await createEditionNFT(`ipfs://${ipfsHash}`);
     } catch (e) {
       console.log(e);
-      // setUploading(false);
+
+      setIsLoading(false);
       alert("Trouble uploading file");
     }
   };
@@ -159,6 +138,10 @@ export const CreatePost = () => {
               formData.append("description", "sarvad");
 
               console.log("file here", file);
+
+              setIsLoading(true);
+              setLoadingText("Generating meme.....");
+
               await uploadFile(formData);
             }
           }, "image/png");
@@ -167,26 +150,71 @@ export const CreatePost = () => {
     }
   };
 
-  // const { writeContract } = useWriteContract();
   const { data: hash, isPending, writeContract } = useWriteContract();
+  const { address } = useAccount();
 
   const createEditionNFT = async (ipfsHash: string) => {
-    const { creator_contract, explorer } = getContractFromChainId(84531);
+    const { creator_contract, explorer } = getContractFromChainId(5);
+
+    setLoadingText("Creating NFT.......");
+
+    const args = flattenContractArgs(
+      generateTokenIdAdjustedContractArgs(
+        createTestZoraEditionConfig(ipfsHash),
+        0
+      )
+    );
+
+    setArgs(args);
 
     writeContract({
-      // chainId: chainId,
+      // chainId: 8453,
       address: creator_contract,
       abi: ZoraAbi,
       functionName: "createEditionWithReferral",
-      args: flattenContractArgs(
-        generateTokenIdAdjustedContractArgs(
-          createTestZoraEditionConfig(ipfsHash),
-          0
-        )
-      ),
+      args: args,
       enabled: true,
     });
   };
+
+  const postNFT = async (createrAddress: string, editionAddress: string) => {
+    await addDoc(collection(db, "nfts"), {
+      creatorAddress: createrAddress,
+      editionAddress: editionAddress,
+      ipfs: `ipfs://${cid}`,
+      mints: 0,
+    });
+
+    setLoadingText("Done");
+  };
+
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    data,
+  } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  useEffect(() => {
+    // Simulate loading
+    setTimeout(() => {
+      // setIsLoading(false);
+    }, 6000); // Assume something is loading for 6 seconds
+  }, []);
+
+  useEffect(() => {
+    const post = async () => {
+      const creatorAddress = address;
+      const editionAddress = data.logs[0].address;
+
+      await postNFT(creatorAddress, editionAddress);
+    };
+
+    if (isConfirmed) {
+      post();
+    }
+  }, [isConfirmed]);
 
   const imageArray = [
     "meme-templates/matrix-morpheus.jpg",
@@ -247,25 +275,72 @@ export const CreatePost = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center h-screen">
-        <div className="p-4 bg-create-form-bg rounded-lg shadow-xl mx-auto my-8 max-w-7xl">
+      <div
+        style={{
+          display: "flex", // Corresponds to `flex`
+          justifyContent: "center", // Corresponds to `justify-center`
+          alignItems: "center", // Corresponds to `items-center`
+          height: "100vh", // Corresponds to `h-screen`, which sets the height to the full height of the viewport
+        }}
+      >
+        <div
+          style={{
+            padding: 20,
+            background: "linear-gradient(108deg, #2E2E2E 0%, #1F1F1F 100%)",
+            boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.16)",
+            borderRadius: 25,
+            overflow: "hidden",
+            border: "1px #525252 solid", // shadow-xl, this is an approximation since Tailwind's shadows are predefined
+            margin: "2rem auto", // mx-auto centers the element, my-8 applies vertical margin, translating to 2rem (32px) top and bottom
+            maxWidth: "80rem", // max-w-7xl, Tailwind's max width classes are predefined, 112rem is an approximation for 7xl
+            maxHeight: "40rem",
+          }}
+        >
+          {/* image carousel part */}
           <ImageCarousel
             images={imageArray}
             onImageSelect={handleCarouselSelection}
+            selectedIndex={selectedIndex}
           />
-          <div className="flex w-full max-w-6xl mx-auto">
-            <div className="flex-1 flex justify-center items-center relative">
-              {/* Meme editor content */}
-              <div ref={memeRef} className="relative user-select-none">
+
+          <div
+            style={{
+              display: "flex", // Corresponds to `flex`
+              width: "100%", // Corresponds to `w-full`, making the element's width 100% of its parent's width
+              maxWidth: "96rem", // Corresponds to `max-w-6xl`, Tailwind's predefined max width for 6xl (this conversion assumes the default Tailwind base font size of 16px, where 1rem = 16px, so 96rem would be 1536px)
+              margin: "0 auto", // Corresponds to `mx-auto`, centers the element horizontally within its parent
+              gap: "20px", // Adds 20px gap between each flex item
+              maxHeight: "30rem",
+            }}
+          >
+            {/* Meme editor content */}
+            <div
+              style={{
+                flex: 1, // Corresponds to `flex-1`, which means the element can grow and shrink, with a flex-basis of 0%
+                display: "flex", // Corresponds to `flex`, making the element a flex container
+                justifyContent: "center", // Corresponds to `justify-center`, centers children along the main axis (horizontally for a row direction)
+                alignItems: "center", // Corresponds to `items-center`, centers children along the cross axis (vertically for a row direction)
+                position: "relative", // Corresponds to `relative`, positions the element relative to its normal position
+              }}
+            >
+              <div
+                ref={memeRef}
+                style={{
+                  position: "relative", // Corresponds to `relative`, which sets the element's position to relative
+                  userSelect: "none", // Corresponds to `user-select-none`, which prevents text selection
+                }}
+              >
                 <img
                   ref={imageRef}
-                  src={
-                    imageSrc === null
-                      ? "meme-templates/always-has-been.jpg"
-                      : imageSrc
-                  }
+                  src={imageSrc === null ? imageArray[0] : imageSrc}
                   alt="Meme"
-                  className="w-auto max-w-full h-auto max-h-full"
+                  style={{
+                    width: "auto", // Corresponds to `w-auto`, allowing the element's width to adjust based on its content up to its container's width
+                    maxWidth: "100%", // Corresponds to `max-w-full`, ensuring the element's maximum width does not exceed the width of its container
+                    height: "30rem", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
+                    maxHeight: "80%",
+                    borderRadius: 8, // Corresponds to `max-h-full`, ensuring the element's maximum height does not exceed the height of its container
+                  }}
                 />
 
                 {texts.map((text) => (
@@ -280,91 +355,123 @@ export const CreatePost = () => {
               </div>
             </div>
 
-            <div className="w-1/3 bg-create-form-bg p-4 overflow-y-auto h-[500px]">
-              <h1 className="text-white text-xl mb-4">Meme Generator</h1>
-              <div className="mb-4">
-                <input
+            {/* side bar stuff */}
+            <div
+              style={{
+                borderRadius: "8px",
+                border: "2px solid #525252",
+                width: "28%", // w-1/3 translates to 33.333333% width of its parent
+                backgroundColor: "#323232", // Replace '#yourColorCode' with the actual color value for 'bg-create-form-bg'
+                padding: "1rem", // p-4 translates to padding of 1rem (16px if the base font size is 16px)
+                overflowY: "auto", // overflow-y-auto enables vertical scrolling if the content overflows the element's height
+                // height: "100%",
+                height: "auto", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
+                maxHeight: "100%",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
+                <div style={{ marginBottom: "10px" }}>
+                  <h1
+                    style={{
+                      color: "white", // text-white translates to setting the text color to white
+                      fontSize: "2rem", // text-xl translates to a font size of 1.25rem (20px if the base font size is 16px)
+                      marginBottom: "2rem", // mb-4 translates to a margin-bottom of 1rem (16px if the base font size is 16px)
+                    }}
+                  >
+                    Create your meme
+                  </h1>
+                  <div
+                    style={{
+                      // marginBottom: "1rem",
+                      height: "auto", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
+                      maxHeight: "50%",
+                    }}
+                  >
+                    {/* <input
                   type="file"
                   onChange={handleImageChange}
-                  className="mb-2"
-                />
-                {texts.map((text) => (
-                  <CustomTextInput
-                    key={text.id}
-                    text={text.text}
-                    onTextChange={(newText) => updateText(text.id, newText)}
-                    onStyleChange={(newStyle) =>
-                      updateTextStyle(text.id, newStyle)
-                    }
-                    style={{
-                      fontName: text.fontName,
-                      fontSize: text.fontSize,
-                      color: text.color,
-                    }}
-                  />
-                ))}
+                  style={{
+                    marginBottom: "0.5rem", // mb-2 translates to a margin-bottom of 0.5rem
+                  }}
+                /> */}
 
-                <button
-                  onClick={exportMeme}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    {texts.map((text) => (
+                      <CustomTextInput
+                        key={text.id}
+                        text={text.text}
+                        onTextChange={(newText) => updateText(text.id, newText)}
+                        onStyleChange={(newStyle) =>
+                          updateTextStyle(text.id, newStyle)
+                        }
+                        style={{
+                          fontName: text.fontName,
+                          fontSize: text.fontSize,
+                          color: text.color,
+                        }}
+                      />
+                    ))}
+
+                    <button
+                      onClick={addText}
+                      style={{
+                        textAlign: "center",
+                        color: "#5A99F2",
+                        fontSize: 14,
+                        fontFamily: "Inter",
+                        fontWeight: "600",
+                        wordWrap: "break-word",
+                      }}
+                    >
+                      Add text +
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    paddingLeft: 32,
+                    paddingRight: 32,
+                    paddingTop: 12,
+                    paddingBottom: 12,
+                    background: "#323232",
+                    borderRadius: 30,
+                    overflow: "hidden",
+                    border: "1px #525252 solid",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 10,
+                    display: "inline-flex",
+                  }}
                 >
-                  Export Meme
-                </button>
-                {/* test adding new text overlays */}
-                <button
-                  onClick={addText}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Add text
-                </button>
+                  <button
+                    onClick={exportMeme}
+                    style={{
+                      marginTop: "auto",
+                      textAlign: "center",
+                      color: "#5A99F2",
+                      fontSize: 14,
+                      fontFamily: "Inter",
+                      fontWeight: "600",
+                      wordWrap: "break-word",
+                    }}
+                  >
+                    Export Meme
+                  </button>
+                </div>
               </div>
             </div>
-
-            {/* <div className="w-1/3 bg-gray-800 p-4 overflow-y-auto">
-              <h1 className="text-white text-xl mb-4">Meme Generator</h1>
-              <div className="mb-4">
-                <input
-                  type="file"
-                  onChange={handleImageChange}
-                  className="mb-2"
-                />
-                {texts.map((text) => (
-                  <CustomTextInput
-                    key={text.id}
-                    text={text.text}
-                    onTextChange={(newText) => updateText(text.id, newText)}
-                    onStyleChange={(newStyle) =>
-                      updateTextStyle(text.id, newStyle)
-                    }
-                    style={{
-                      fontName: text.fontName,
-                      fontSize: text.fontSize,
-                      color: text.color,
-                    }}
-                  />
-                ))}
-
-                <button
-                  onClick={exportMeme}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Export Meme
-                </button>
-                <button
-                  onClick={addText}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Add text
-                </button>
-              </div>
-            </div> */}
           </div>
         </div>
       </div>
+
+      {isLoading && <Loader loadingText={loadingText} />}
     </>
   );
 };
-
-/* {hash && (
-                <div className="text-pink-500">Transaction Hash: {hash}</div>
-              )} */

@@ -565,6 +565,8 @@ const ZORA_NFT_CREATOR_PROXY_OP_TESTNET =
   "0x3C1ebcF36Ca9DD9371c9aA99c274e4988906c6E3";
 const ZORA_NFT_CREATOR_PROXY_ZORA_TESTNET =
   "0xeB29A4e5b84fef428c072debA2444e93c080CE87";
+const ZORA_NFT_CREATOR_PROXY_GOERLI_TESTNET =
+  "0xb9583D05Ba9ba8f7F14CCEe3Da10D2bc0A72f519";
 
 // rewards testnet
 const ZORA_PROTOCOL_REWARDS_BASE_TESTNET =
@@ -572,6 +574,8 @@ const ZORA_PROTOCOL_REWARDS_BASE_TESTNET =
 const ZORA_PROTOCOL_REWARDS_OP_TESTNET =
   "0x7777777F279eba3d3Ad8F4E708545291A6fDBA8B";
 const ZORA_PROTOCOL_REWARDS_ZORA_TESTNET =
+  "0x7777777F279eba3d3Ad8F4E708545291A6fDBA8B";
+const ZORA_PROTOCOL_REWARDS_GOERLI_TESTNET =
   "0x7777777F279eba3d3Ad8F4E708545291A6fDBA8B";
 
 export const getContractFromChainId = (chainId: number) => {
@@ -586,6 +590,14 @@ export const getContractFromChainId = (chainId: number) => {
         explorer: "https://etherscan.io",
         bridge: "https://app.uniswap.org/swap",
         chainId: 1,
+      };
+    case 5:
+      return {
+        creator_contract: ZORA_NFT_CREATOR_PROXY_GOERLI_TESTNET,
+        rewards_contract: ZORA_PROTOCOL_REWARDS_GOERLI_TESTNET,
+        explorer: "https://goerli.etherscan.io",
+        bridge: "https://app.uniswap.org/swap",
+        chainId: 5,
       };
     case 8453:
       return {

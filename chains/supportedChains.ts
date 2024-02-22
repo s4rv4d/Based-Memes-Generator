@@ -6,6 +6,7 @@ export const supportedChains = [
   { id: 84531, name: "Base Goerli" },
   { id: 420, name: "Optimism Goerli" },
   { id: 999, name: "Zora Goerli" },
+  { id: 5, name: "Goerli" },
 ];
 
 export const getChainName = (chainId: number) => {

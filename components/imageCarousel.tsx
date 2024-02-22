@@ -4,11 +4,13 @@ import React, { useState } from "react";
 interface ImageCarouselProps {
   images: string[];
   onImageSelect: ({ index }: { index: number }) => {};
+  selectedIndex: number;
 }
 
 const ImageCarousel: React.FC<ImageCarouselProps> = ({
   images,
   onImageSelect,
+  selectedIndex,
 }) => {
   return (
     <div className="flex overflow-x-auto w-full new-create-bg">
@@ -18,7 +20,13 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
           src={image}
           alt={`Carousel image ${index}`}
           className="flex-shrink-0 object-cover"
-          style={{ height: "5rem", paddingBottom: 20 }}
+          style={{
+            height: "5rem",
+            border: index === selectedIndex ? "2px solid white" : "none",
+            borderRadius: 8,
+            margin: 8,
+            marginBottom: 12,
+          }}
           onClick={() => {
             onImageSelect({ index });
           }}
