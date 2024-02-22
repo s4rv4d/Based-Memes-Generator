@@ -8,11 +8,13 @@ const Loader = ({
   isCompleted,
   isError,
   txnURL,
+  dbId,
 }: {
   loadingText: string;
   isCompleted: boolean;
   isError: boolean;
   txnURL: string;
+  dbId: string;
 }) => {
   const loaderStyles = {
     position: "absolute", // Use 'absolute' if you want it relative to a container
@@ -138,7 +140,10 @@ const Loader = ({
               </a>
             </div>
 
-            <ShareButton message="test" url="localhost:3000/nft/" />
+            <ShareButton
+              message="i just minted a MEME using basedMeme generator, guess I'm pretty BASED :)"
+              url={`localhost:3000/nft/${dbId}`}
+            />
           </div>
         </>
       )}

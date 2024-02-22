@@ -1,23 +1,18 @@
-import React, { use } from "react";
+import React from "react";
 import { db } from "../app/firebase";
 import { useEffect, useState } from "react";
-import {
-  QuerySnapshot,
-  collection,
-  getDocs,
-  onSnapshot,
-  query,
-} from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import "./styles/gallery.css";
-import { parseIpfsUrl } from "@/hooks/useZoraCreateEdition";
 import Page from "../app/post/page";
+import NFTPost from "./NFTPost";
 
 interface Nft {
   id: string;
   creatorAddress: string;
   editionAddress: string;
   ipfs: string;
-  // mints: number;
+  mints: number;
+  fileName: string;
 }
 
 export default function Gallery() {
@@ -33,14 +28,8 @@ export default function Gallery() {
         itemsArray.push({ ...doc.data(), id: doc.id });
       });
 
-      // console.log(typeof itemsArray);
-
       setNfts((prevItemArray) => itemsArray);
-
-      // console.log(nfts);
     });
-
-    // test();
 
     return () => unsubscribe();
   }, []);
@@ -84,7 +73,7 @@ export default function Gallery() {
         }}
       >
         <div className="container px-5 py-24 mx-auto">
-          <div className="flex flex-col text-center w-full mb-20">
+          <div className="flex flex-col text-left w-full mb-20">
             <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-white">
               Recent Creations
             </h1>
@@ -103,97 +92,16 @@ export default function Gallery() {
                 padding: "2rem", // Converts 'p-4' assuming 1rem = 16px, and '4' in Tailwind corresponds to 1rem
               }}
             >
-              <div
-                style={{
-                  display: "flex", // Converts 'flex'
-                  position: "relative", // Converts 'relative'
-                }}
-              >
+              <div className="columns-1 gap-5 sm:columns-2 sm:gap-8 md:columns-3 lg:columns-4">
                 {nfts.map((nft, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      padding: 20,
-                      background:
-                        "linear-gradient(108deg, #2E2E2E 0%, #1F1F1F 100%)",
-                      boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.16)",
-                      borderRadius: 25,
-                      overflow: "hidden",
-                      border: "1px #525252 solid",
-                      justifyContent: "flex-start",
-                      alignItems: "flex-start",
-                      gap: 10,
-                      display: "inline-flex",
-                      flexDirection: "column",
-                      margin: "16px",
-                    }}
-                    onClick={() => {
-                      showPostView();
+                  <NFTPost
+                    index={index}
+                    nft={nft}
+                    showPostView={showPostView}
+                    setPost={(nft: Nft) => {
                       setSelectedPost(nft);
                     }}
-                  >
-                    <div
-                      style={{
-                        gap: 4,
-                      }}
-                    >
-                      <div
-                        style={{
-                          color: "#CDCDD0",
-                          fontSize: 16,
-                          fontFamily: "Inter",
-                          fontWeight: "600",
-                          // lineHeight: 24,
-                          wordWrap: "break-word",
-                        }}
-                      >
-                        Drake Hotline Bling
-                      </div>
-                      <div>
-                        <span
-                          style={{
-                            color: "#A6A6B0",
-                            fontSize: 12,
-                            fontFamily: "Inter",
-                            fontWeight: "400",
-                            // lineHeight: 18,
-                            wordWrap: "break-word",
-                          }}
-                        >
-                          Added by{" "}
-                        </span>
-                        <span
-                          style={{
-                            color: "#A6A6B0",
-                            fontSize: 12,
-                            fontFamily: "Inter",
-                            fontWeight: "600",
-                            // lineHeight: 18,
-                            wordWrap: "break-word",
-                          }}
-                        >
-                          Based Meme · 0 mints
-                        </span>
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        background: "white",
-                        borderRadius: 8,
-                        overflow: "hidden",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        display: "inline-flex",
-                      }}
-                    >
-                      <img
-                        className="nft-image"
-                        src={parseIpfsUrl(nft.ipfs).gateway}
-                      />
-                    </div>
-                  </div>
+                  />
                 ))}
               </div>
             </div>

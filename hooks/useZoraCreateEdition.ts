@@ -277,16 +277,17 @@ export const generateTokenIdAdjustedContractArgs = (
 };
 
 export function createTestZoraEditionConfig(
-  ipfsHash: string
+  ipfsHash: string,
+  creatorAddress: string
 ): ConfigurableZoraEditionOutput | null {
   // Example test data object
   const testData = {
-    creator: "0x5371d2E73edf765752121426b842063fbd84f713",
-    name: "Test NFT2",
-    symbol: "TNFT2",
+    creator: creatorAddress,
+    name: "Based Meme",
+    symbol: "BMEME",
     editionSize: "open",
     royaltyBPS: "zero",
-    description: "This is a test NFT created with based meme generator",
+    description: "Meme created by BasedMeme generator",
     animationURI: ipfsHash,
     imageURI: ipfsHash,
     saleConfig: {

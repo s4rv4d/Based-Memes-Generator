@@ -1,19 +1,21 @@
 "use client";
-import { useState, useRef } from "react";
-import { useAccount } from "wagmi";
+import { useState } from "react";
+import { useAccount, useEnsName } from "wagmi";
 import { useEffect } from "react";
 import { parseIpfsUrl } from "@/hooks/useZoraCreateEdition";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { ZoraAbi, getContractFromChainId } from "../../abi/zoraEdition";
-import { write } from "fs";
 import Loader from "@/components/loader";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 interface Nft {
   id: string;
   creatorAddress: string;
   editionAddress: string;
   ipfs: string;
-  // mints: number;
+  mints: number;
+  fileName: string;
 }
 
 export const PostInfo = ({ item }: { item: Nft }) => {
@@ -27,7 +29,11 @@ export const PostInfo = ({ item }: { item: Nft }) => {
   const { address } = useAccount();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
-  const { creator_contract, explorer } = getContractFromChainId(5);
+  const { explorer } = getContractFromChainId(5);
+  const [dbUpdateDone, setDbUpdateDone] = useState<boolean>(false);
+  const [nft, setNft] = useState<Nft>(item);
+
+  const { data: ensName } = useEnsName({ address: nft.creatorAddress });
 
   const computeEthToSpend = (publicSalePrice: string, numEditions: string) => {
     if (numEditions === "")
@@ -89,17 +95,13 @@ export const PostInfo = ({ item }: { item: Nft }) => {
   };
 
   const mintEditionNFT = async () => {
-    console.log("entered minting function");
-
-    console.log(item.editionAddress);
-    console.log(address);
     setIsLoading(true);
+    setLoadingText("Minting...");
 
     let userAddress = address;
 
     writeContract({
-      //   chainId: 8453,
-      address: item.editionAddress,
+      address: nft.editionAddress,
       abi: ZoraAbi,
       functionName: "mintWithRewards",
       args: [
@@ -123,9 +125,58 @@ export const PostInfo = ({ item }: { item: Nft }) => {
     hash,
   });
 
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(`localhost:3000/nft/${nft.id}`);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  const ShareIcon = ({ size = 24, color = "currentColor" }) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="feather feather-share"
+      onClick={() => copyToClipboard()}
+    >
+      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+      <polyline points="16 6 12 2 8 6"></polyline>
+      <line x1="12" y1="2" x2="12" y2="15"></line>
+    </svg>
+  );
+
+  const handleOverlayClick = () => {
+    if (dbUpdateDone || isReceiptError || isError || isConfirmed) {
+      setIsLoading(false);
+      setDbUpdateDone(false);
+    }
+  };
+
+  const handleModalClick = (e) => {
+    e.stopPropagation();
+  };
+
   useEffect(() => {
     const post = async () => {
       console.log(data);
+
+      let currentMint = nft.mints;
+
+      const docRef = doc(db, "nfts", nft.id);
+
+      await updateDoc(docRef, { ...nft, mints: currentMint + 1 });
+
+      setNft({ ...nft, mints: currentMint + 1 });
+
+      setDbUpdateDone(true);
     };
 
     if (isConfirmed) {
@@ -133,7 +184,6 @@ export const PostInfo = ({ item }: { item: Nft }) => {
     }
 
     if (isError) {
-      // alert(error);
       if (
         error?.message &&
         (error.message.includes("insufficient funds") ||
@@ -152,7 +202,6 @@ export const PostInfo = ({ item }: { item: Nft }) => {
     }
 
     if (isReceiptError) {
-      // alert(reciptError);
       if (
         reciptError?.message &&
         (reciptError.message.includes("insufficient funds") ||
@@ -168,9 +217,6 @@ export const PostInfo = ({ item }: { item: Nft }) => {
       } else {
         setLoadingText(reciptError?.message);
       }
-
-      alert(error);
-      alert(reciptError);
     }
   }, [isConfirmed, isError, isReceiptError]);
 
@@ -214,7 +260,7 @@ export const PostInfo = ({ item }: { item: Nft }) => {
                   wordWrap: "break-word",
                 }}
               >
-                Drake Hotline Bling
+                {nft.fileName ? nft.fileName : "Based Meme"}
               </div>
               <div>
                 <span
@@ -223,7 +269,6 @@ export const PostInfo = ({ item }: { item: Nft }) => {
                     fontSize: 14,
                     fontFamily: "Inter",
                     fontWeight: "400",
-                    // lineHeight: 18,
                     wordWrap: "break-word",
                   }}
                 >
@@ -235,45 +280,61 @@ export const PostInfo = ({ item }: { item: Nft }) => {
                     fontSize: 14,
                     fontFamily: "Inter",
                     fontWeight: "600",
-                    // lineHeight: 18,
                     wordWrap: "break-word",
                   }}
                 >
-                  Based Meme · 0 mints
+                  {ensName
+                    ? ensName
+                    : nft.creatorAddress.slice(0, 4) +
+                      "...." +
+                      nft.creatorAddress.slice(-4)}
+                  {` · ${nft.mints ? nft.mints : 0} mints`}
                 </span>
               </div>
             </div>
+
             <div
               style={{
-                paddingLeft: 32,
-                paddingRight: 32,
-                paddingTop: 12,
-                paddingBottom: 12,
-                background: "#323232",
-                borderRadius: 30,
-                overflow: "hidden",
-                border: "1px #525252 solid",
+                display: "flex",
+                flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
-                gap: 10,
-                display: "inline-flex",
+                gap: "10px",
               }}
             >
-              <button
+              <ShareIcon />
+              <div
                 style={{
-                  textAlign: "center",
-                  color: "#5A99F2",
-                  fontSize: 14,
-                  fontFamily: "Inter",
-                  fontWeight: "600",
-                  wordWrap: "break-word",
-                }}
-                onClick={() => {
-                  mintEditionNFT();
+                  paddingLeft: 32,
+                  paddingRight: 32,
+                  paddingTop: 12,
+                  paddingBottom: 12,
+                  background: "#323232",
+                  borderRadius: 30,
+                  overflow: "hidden",
+                  border: "1px #525252 solid",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 10,
+                  display: "inline-flex",
                 }}
               >
-                Mint
-              </button>
+                <button
+                  style={{
+                    textAlign: "center",
+                    color: "#5A99F2",
+                    fontSize: 14,
+                    fontFamily: "Inter",
+                    fontWeight: "600",
+                    wordWrap: "break-word",
+                  }}
+                  onClick={() => {
+                    mintEditionNFT();
+                  }}
+                >
+                  Mint
+                </button>
+              </div>
             </div>
           </div>
 
@@ -289,7 +350,7 @@ export const PostInfo = ({ item }: { item: Nft }) => {
             }}
           >
             <img
-              src={parseIpfsUrl(item.ipfs).gateway}
+              src={parseIpfsUrl(nft.ipfs).gateway}
               style={{
                 width: "auto", // Corresponds to `w-auto`, allowing the element's width to adjust based on its content up to its container's width
                 maxWidth: "100%", // Corresponds to `max-w-full`, ensuring the element's maximum width does not exceed the width of its container
@@ -300,13 +361,35 @@ export const PostInfo = ({ item }: { item: Nft }) => {
           </div>
         </div>
       </div>
+
       {isLoading && (
-        <Loader
-          loadingText={loadingText}
-          isCompleted={isConfirmed}
-          isError={isError ? isError : isReceiptError ? isReceiptError : false}
-          txnURL={explorer + `/tx/${hash}`}
-        />
+        <div
+          onClick={handleOverlayClick}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0, 0, 0, 0.8)",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div onClick={handleModalClick}>
+            <Loader
+              loadingText={loadingText}
+              isCompleted={dbUpdateDone}
+              isError={
+                isError ? isError : isReceiptError ? isReceiptError : false
+              }
+              txnURL={explorer + `/tx/${hash}`}
+              dbId={nft.id}
+            />
+          </div>
+        </div>
       )}
     </>
   );

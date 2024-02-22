@@ -10,3 +10,14 @@
     width: 100%; /* Make the image fill the container */
   }
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .auto-rows-auto {
+    /* Ensures the row height is based on the content */
+    grid-auto-rows: auto;
+  }
+}

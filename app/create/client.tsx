@@ -21,16 +21,24 @@ import {
 
 export const CreatePost = () => {
   const [imageSrc, setImageSrc] = useState(null); // To store the uploaded image source
-  const [file, setFile] = useState<File | null>(null);
   const [cid, setCid] = useState("");
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-  });
   const [args, setArgs] = useState<any[] | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
+  const [fileName, setFileName] = useState<string>("");
+  const [dbId, setDbId] = useState<string>("");
+  const [dbPushDone, setDbPushDone] = useState<boolean>(false);
+
+  const {
+    data: hash,
+    isPending,
+    writeContract,
+    error,
+    isError,
+  } = useWriteContract();
+  const { address } = useAccount();
+  const { creator_contract, explorer } = getContractFromChainId(5);
 
   const [texts, setTexts] = useState([
     {
@@ -84,6 +92,10 @@ export const CreatePost = () => {
     reader.readAsDataURL(file);
   };
 
+  const handleFileNameUpdate = (fileName: string) => {
+    setFileName(fileName);
+  };
+
   const handleCarouselSelection = ({ index }: { index: number }) => {
     const file = imageArray[index];
     setImageSrc(file);
@@ -134,10 +146,11 @@ export const CreatePost = () => {
 
               const formData = new FormData();
               formData.append("file", file, file.name); // Append the file
-              formData.append("name", "testing");
-              formData.append("description", "sarvad");
-
-              console.log("file here", file);
+              formData.append("name", "Based Meme");
+              formData.append(
+                "description",
+                "meme generaterated using basedMeme"
+              );
 
               setIsLoading(true);
               setLoadingText("Generating meme.....");
@@ -150,17 +163,12 @@ export const CreatePost = () => {
     }
   };
 
-  const { data: hash, isPending, writeContract } = useWriteContract();
-  const { address } = useAccount();
-
   const createEditionNFT = async (ipfsHash: string) => {
-    const { creator_contract, explorer } = getContractFromChainId(5);
-
-    setLoadingText("Creating NFT.......");
+    setLoadingText("Creating NFT Edition.......");
 
     const args = flattenContractArgs(
       generateTokenIdAdjustedContractArgs(
-        createTestZoraEditionConfig(ipfsHash),
+        createTestZoraEditionConfig(ipfsHash, address),
         0
       )
     );
@@ -178,43 +186,105 @@ export const CreatePost = () => {
   };
 
   const postNFT = async (createrAddress: string, editionAddress: string) => {
-    await addDoc(collection(db, "nfts"), {
+    const res = await addDoc(collection(db, "nfts"), {
       creatorAddress: createrAddress,
       editionAddress: editionAddress,
       ipfs: `ipfs://${cid}`,
       mints: 0,
+      fileName: fileName,
     });
 
-    setLoadingText("Done");
+    return res._key.path.segments[1];
   };
 
   const {
     isLoading: isConfirming,
     isSuccess: isConfirmed,
     data,
+    error: reciptError,
+    isError: isReceiptError,
   } = useWaitForTransactionReceipt({
     hash,
   });
-
-  useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      // setIsLoading(false);
-    }, 6000); // Assume something is loading for 6 seconds
-  }, []);
 
   useEffect(() => {
     const post = async () => {
       const creatorAddress = address;
       const editionAddress = data.logs[0].address;
 
-      await postNFT(creatorAddress, editionAddress);
+      const res = await postNFT(creatorAddress, editionAddress);
+      setDbId(res);
+      setDbPushDone(true);
+      setLoadingText("Done");
+      console.log(res);
     };
 
     if (isConfirmed) {
       post();
     }
-  }, [isConfirmed]);
+
+    if (isError) {
+      // alert(error);
+      if (
+        error?.message &&
+        (error.message.includes("insufficient funds") ||
+          error.message.includes("exceeds the balance of the account"))
+      ) {
+        setLoadingText("Insufficient funds");
+      } else if (
+        error?.message &&
+        (error.message.includes("User rejected the request") ||
+          error.message.includes("User rejected the request"))
+      ) {
+        setLoadingText("Request denied :(");
+      } else {
+        setLoadingText(error?.message);
+      }
+    }
+
+    if (isReceiptError) {
+      // alert(reciptError);
+      if (
+        reciptError?.message &&
+        (reciptError.message.includes("insufficient funds") ||
+          reciptError.message.includes("exceeds the balance of the account"))
+      ) {
+        setLoadingText("Insufficient funds");
+      } else if (
+        reciptError?.message &&
+        (reciptError.message.includes("User rejected the request") ||
+          reciptError.message.includes("User rejected the request"))
+      ) {
+        setLoadingText("Request denied :(");
+      } else {
+        setLoadingText(reciptError?.message);
+      }
+    }
+  }, [isConfirmed, isError, isReceiptError]);
+
+  useEffect(() => {
+    if (isLoading) {
+      // Prevent scrolling on mount
+      document.body.style.overflow = "hidden";
+    } else {
+      // Re-enable scrolling on cleanup
+      document.body.style.overflow = "auto";
+    }
+    // Cleanup function to revert the overflow style back to 'auto' when the component unmounts or showCreate changes
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isLoading]);
+
+  const handleOverlayClick = () => {
+    if (dbPushDone || isReceiptError || isError) {
+      setIsLoading(false);
+    }
+  };
+
+  const handleModalClick = (e) => {
+    e.stopPropagation();
+  };
 
   const imageArray = [
     "meme-templates/matrix-morpheus.jpg",
@@ -364,7 +434,6 @@ export const CreatePost = () => {
                 backgroundColor: "#323232", // Replace '#yourColorCode' with the actual color value for 'bg-create-form-bg'
                 padding: "1rem", // p-4 translates to padding of 1rem (16px if the base font size is 16px)
                 overflowY: "auto", // overflow-y-auto enables vertical scrolling if the content overflows the element's height
-                // height: "100%",
                 height: "auto", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
                 maxHeight: "100%",
               }}
@@ -394,13 +463,30 @@ export const CreatePost = () => {
                       maxHeight: "50%",
                     }}
                   >
-                    {/* <input
-                  type="file"
-                  onChange={handleImageChange}
-                  style={{
-                    marginBottom: "0.5rem", // mb-2 translates to a margin-bottom of 0.5rem
-                  }}
-                /> */}
+                    <div
+                      style={{
+                        background: "#424242",
+                        borderRadius: "4px",
+                        border: "2px solid #525252",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <input
+                        type="text"
+                        placeholder="Meme name"
+                        onChange={(e) => {
+                          handleFileNameUpdate(e.target.value);
+                        }}
+                        value={fileName}
+                        style={{
+                          color: "#FFFFFF",
+                          height: "40px",
+                          width: "100%",
+                          background: "#424242",
+                          paddingLeft: "16px",
+                        }}
+                      />
+                    </div>
 
                     {texts.map((text) => (
                       <CustomTextInput
@@ -440,7 +526,7 @@ export const CreatePost = () => {
                     paddingRight: 32,
                     paddingTop: 12,
                     paddingBottom: 12,
-                    background: "#323232",
+                    background: "#0252FF",
                     borderRadius: 30,
                     overflow: "hidden",
                     border: "1px #525252 solid",
@@ -450,19 +536,22 @@ export const CreatePost = () => {
                     display: "inline-flex",
                   }}
                 >
+                  <img src="base-logo.png" alt="baseLogo" />
+
                   <button
                     onClick={exportMeme}
                     style={{
                       marginTop: "auto",
                       textAlign: "center",
-                      color: "#5A99F2",
+                      color: "white",
                       fontSize: 14,
                       fontFamily: "Inter",
                       fontWeight: "600",
                       wordWrap: "break-word",
                     }}
+                    disabled={fileName.length === 0}
                   >
-                    Export Meme
+                    Mint a Meme NFT
                   </button>
                 </div>
               </div>
@@ -471,7 +560,35 @@ export const CreatePost = () => {
         </div>
       </div>
 
-      {isLoading && <Loader loadingText={loadingText} />}
+      {isLoading && (
+        <div
+          onClick={handleOverlayClick}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0, 0, 0, 0.8)",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div onClick={handleModalClick}>
+            <Loader
+              loadingText={loadingText}
+              isCompleted={dbPushDone}
+              isError={
+                isError ? isError : isReceiptError ? isReceiptError : false
+              }
+              txnURL={explorer + `/tx/${hash}`}
+              dbId={dbId}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 };

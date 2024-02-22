@@ -1,8 +1,8 @@
 "use client";
 import { db } from "../../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useEnsName } from "wagmi";
 import { parseIpfsUrl } from "@/hooks/useZoraCreateEdition";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { ZoraAbi, getContractFromChainId } from "../../../abi/zoraEdition";
@@ -15,24 +15,20 @@ interface Nft {
   creatorAddress: string;
   editionAddress: string;
   ipfs: string;
-  // mints: number;
+  mints: number;
+  fileName: string;
 }
 
 export const Post = ({ id }: { id: string }) => {
   const [nft, setNft] = useState<Nft>();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
+  const [dbUpdateDone, setDbUpdateDone] = useState<boolean>(false);
 
   const { isConnected } = useAccount();
-
-  const {
-    data: hash,
-    isPending,
-    writeContract,
-    error,
-    isError,
-  } = useWriteContract();
+  const { data: hash, writeContract, error, isError } = useWriteContract();
   const { address } = useAccount();
+  const { explorer } = getContractFromChainId(5);
 
   function ConnectWallet() {
     return <WalletOptions />;
@@ -98,12 +94,8 @@ export const Post = ({ id }: { id: string }) => {
   };
 
   const mintEditionNFT = async () => {
-    console.log("entered minting function");
     setIsLoading(true);
-    const { creator_contract, explorer } = getContractFromChainId(5);
-
-    console.log(nft.editionAddress);
-    console.log(address);
+    setLoadingText("Minting...");
 
     let userAddress = address;
 
@@ -127,13 +119,33 @@ export const Post = ({ id }: { id: string }) => {
     isLoading: isConfirming,
     isSuccess: isConfirmed,
     data,
+    error: reciptError,
+    isError: isReceiptError,
   } = useWaitForTransactionReceipt({
     hash,
   });
 
+  const handleOverlayClick = () => {
+    if (dbUpdateDone || isReceiptError || isError || isConfirmed) {
+      setIsLoading(false);
+      setDbUpdateDone(false);
+    }
+  };
+
+  const handleModalClick = (e) => {
+    e.stopPropagation();
+  };
+
   useEffect(() => {
     const post = async () => {
       console.log(data);
+
+      let currentMint = nft.mints;
+      const docRef = doc(db, "nfts", nft.id);
+      await updateDoc(docRef, { ...nft, mints: currentMint + 1 });
+      setDbUpdateDone(true);
+
+      setNft({ ...nft, mints: currentMint + 1 });
     };
 
     if (isConfirmed) {
@@ -141,20 +153,41 @@ export const Post = ({ id }: { id: string }) => {
     }
 
     if (isError) {
-      // alert(error);
-      console.log(error?.message);
-
       if (
         error?.message &&
         (error.message.includes("insufficient funds") ||
           error.message.includes("exceeds the balance of the account"))
       ) {
         setLoadingText("Insufficient funds");
+      } else if (
+        error?.message &&
+        (error.message.includes("User rejected the request") ||
+          error.message.includes("User rejected the request"))
+      ) {
+        setLoadingText("Request denied :(");
       } else {
         setLoadingText(error?.message);
       }
     }
-  }, [isConfirmed, isError, error]);
+
+    if (isReceiptError) {
+      if (
+        reciptError?.message &&
+        (reciptError.message.includes("insufficient funds") ||
+          reciptError.message.includes("exceeds the balance of the account"))
+      ) {
+        setLoadingText("Insufficient funds");
+      } else if (
+        reciptError?.message &&
+        (reciptError.message.includes("User rejected the request") ||
+          reciptError.message.includes("User rejected the request"))
+      ) {
+        setLoadingText("Request denied :(");
+      } else {
+        setLoadingText(reciptError?.message);
+      }
+    }
+  }, [isConfirmed, isError, isReceiptError]);
 
   useEffect(() => {
     const getData = async () => {
@@ -216,7 +249,7 @@ export const Post = ({ id }: { id: string }) => {
                       wordWrap: "break-word",
                     }}
                   >
-                    Drake Hotline Bling
+                    {nft.fileName ? nft.fileName : "Based Meme"}
                   </div>
                   <div>
                     <span
@@ -241,7 +274,10 @@ export const Post = ({ id }: { id: string }) => {
                         wordWrap: "break-word",
                       }}
                     >
-                      Based Meme · 0 mints
+                      {nft.creatorAddress.slice(0, 4) +
+                        "...." +
+                        nft.creatorAddress.slice(-4)}
+                      {` · ${nft.mints ? nft.mints : 0} mints`}
                     </span>
                   </div>
                 </div>
@@ -310,7 +346,35 @@ export const Post = ({ id }: { id: string }) => {
         )}
       </div>
 
-      {isLoading && <Loader loadingText={loadingText} isCompleted={false} />}
+      {isLoading && (
+        <div
+          onClick={handleOverlayClick}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(0, 0, 0, 0.8)",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div onClick={handleModalClick}>
+            <Loader
+              loadingText={loadingText}
+              isCompleted={dbUpdateDone}
+              isError={
+                isError ? isError : isReceiptError ? isReceiptError : false
+              }
+              txnURL={explorer + `/tx/${hash}`}
+              dbId={id}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 };
