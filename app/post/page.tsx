@@ -5,7 +5,8 @@ interface Nft {
   creatorAddress: string;
   editionAddress: string;
   ipfs: string;
-  // mints: number;
+  mints: number;
+  fileName: string;
 }
 
 export default function Page({ item }: { item: Nft }) {

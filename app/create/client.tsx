@@ -26,7 +26,7 @@ export const CreatePost = () => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
-  const [fileName, setFileName] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("Based Meme");
   const [dbId, setDbId] = useState<string>("");
   const [dbPushDone, setDbPushDone] = useState<boolean>(false);
 
@@ -262,19 +262,19 @@ export const CreatePost = () => {
     }
   }, [isConfirmed, isError, isReceiptError]);
 
-  useEffect(() => {
-    if (isLoading) {
-      // Prevent scrolling on mount
-      document.body.style.overflow = "hidden";
-    } else {
-      // Re-enable scrolling on cleanup
-      document.body.style.overflow = "auto";
-    }
-    // Cleanup function to revert the overflow style back to 'auto' when the component unmounts or showCreate changes
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isLoading]);
+  // useEffect(() => {
+  //   if (isLoading) {
+  //     // Prevent scrolling on mount
+  //     document.body.style.overflow = "hidden";
+  //   } else {
+  //     // Re-enable scrolling on cleanup
+  //     document.body.style.overflow = "auto";
+  //   }
+  //   // Cleanup function to revert the overflow style back to 'auto' when the component unmounts or showCreate changes
+  //   return () => {
+  //     document.body.style.overflow = "auto";
+  //   };
+  // }, [isLoading]);
 
   const handleOverlayClick = () => {
     if (dbPushDone || isReceiptError || isError) {
@@ -403,7 +403,6 @@ export const CreatePost = () => {
                 <img
                   ref={imageRef}
                   src={imageSrc === null ? imageArray[0] : imageSrc}
-                  alt="Meme"
                   style={{
                     width: "auto", // Corresponds to `w-auto`, allowing the element's width to adjust based on its content up to its container's width
                     maxWidth: "100%", // Corresponds to `max-w-full`, ensuring the element's maximum width does not exceed the width of its container
@@ -458,9 +457,9 @@ export const CreatePost = () => {
                   </h1>
                   <div
                     style={{
-                      // marginBottom: "1rem",
+                      marginBottom: "1rem",
                       height: "auto", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
-                      maxHeight: "50%",
+                      maxHeight: "40%",
                     }}
                   >
                     <div
@@ -522,6 +521,8 @@ export const CreatePost = () => {
 
                 <div
                   style={{
+                    marginTop: "auto",
+                    marginBottom: "12px",
                     paddingLeft: 32,
                     paddingRight: 32,
                     paddingTop: 12,
@@ -534,20 +535,22 @@ export const CreatePost = () => {
                     alignItems: "center",
                     gap: 10,
                     display: "inline-flex",
+                    height: "50px",
+                    boxSizing: "border-box",
                   }}
                 >
-                  <img src="base-logo.png" alt="baseLogo" />
+                  <img src="base-logo.png" alt="baseLogo" layout="fill" />
 
                   <button
                     onClick={exportMeme}
                     style={{
-                      marginTop: "auto",
                       textAlign: "center",
                       color: "white",
                       fontSize: 14,
                       fontFamily: "Inter",
                       fontWeight: "600",
                       wordWrap: "break-word",
+                      height: "50px",
                     }}
                     disabled={fileName.length === 0}
                   >

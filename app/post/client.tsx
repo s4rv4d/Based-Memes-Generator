@@ -350,6 +350,7 @@ export const PostInfo = ({ item }: { item: Nft }) => {
             }}
           >
             <img
+              alt="meme-image"
               src={parseIpfsUrl(nft.ipfs).gateway}
               style={{
                 width: "auto", // Corresponds to `w-auto`, allowing the element's width to adjust based on its content up to its container's width

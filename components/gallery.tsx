@@ -24,6 +24,7 @@ export default function Gallery() {
     const q = query(collection(db, "nfts"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let itemsArray: Nft[] = [];
+      console.log(querySnapshot);
       querySnapshot.forEach((doc) => {
         itemsArray.push({ ...doc.data(), id: doc.id });
       });
@@ -95,6 +96,7 @@ export default function Gallery() {
               <div className="columns-1 gap-5 sm:columns-2 sm:gap-8 md:columns-3 lg:columns-4">
                 {nfts.map((nft, index) => (
                   <NFTPost
+                    key={index}
                     index={index}
                     nft={nft}
                     showPostView={showPostView}

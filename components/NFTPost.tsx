@@ -105,7 +105,11 @@ const NFTPost = ({
           display: "inline-flex",
         }}
       >
-        <img className="nft-image" src={parseIpfsUrl(nft.ipfs).gateway} />
+        <img
+          className="nft-image"
+          src={parseIpfsUrl(nft.ipfs).gateway}
+          alt="meme-image"
+        />
       </div>
     </div>
   );

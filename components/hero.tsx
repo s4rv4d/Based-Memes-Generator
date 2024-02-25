@@ -2,7 +2,11 @@
 import React from "react";
 import Link from "next/link";
 
-export default function Hero({ showCreateView }) {
+export default function Hero({
+  showCreateView,
+}: {
+  showCreateView: () => void;
+}) {
   return (
     <section className="text-gray-600 body-font">
       <div className="container mx-auto flex px-5 py-24 md:flex-row flex-col items-center">
@@ -26,7 +30,6 @@ export default function Hero({ showCreateView }) {
               }}
             >
               Craft Your Humour, Mint Your NFT
-              {/* <br className="hidden lg:inline-block">readymade gluten */}
             </h1>
             <p
               style={{
@@ -82,7 +85,7 @@ export default function Hero({ showCreateView }) {
           <img
             className="object-cover object-center rounded"
             alt="hero"
-            src="https://i.postimg.cc/JnzWGTJY/Group-4.png"
+            src="heroImage.png"
           />
         </div>
       </div>
