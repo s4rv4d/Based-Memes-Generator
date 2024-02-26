@@ -45,7 +45,7 @@ export default function Home() {
           zIndex: 10, // Ensure this is higher than other content but lower than the overlay
         }}
       >
-        <div className="bg-custom-black bg-gradient-to-r from-custom-green via-custom-black to-custom-black">
+        <div className="bg-custom-black bg-gradient-to-r from-custom-blue via-custom-black to-custom-black">
           <Header />
           <Hero showCreateView={showCreateView} />
         </div>

@@ -4,8 +4,8 @@ import { Rnd, DraggableEventHandler, ResizeHandler } from "react-rnd";
 // Extending the interface to include style properties
 interface TextOverlayProps {
   text: string;
-  onDragStop: DraggableEventHandler;
-  onResizeStop: ResizeHandler;
+  onDragStop: DraggableEventHandler | null;
+  onResizeStop: ResizeHandler | null;
   fontName: string;
   fontSize: string;
   color: string;

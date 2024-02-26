@@ -10,7 +10,7 @@ const Loader = ({
   txnURL,
   dbId,
 }: {
-  loadingText: string;
+  loadingText: string | undefined;
   isCompleted: boolean;
   isError: boolean;
   txnURL: string;
@@ -66,7 +66,30 @@ const Loader = ({
   };
 
   return (
-    <div style={loaderStyles}>
+    <div
+      style={{
+        position: "absolute", // Use 'absolute' if you want it relative to a container
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        textAlign: "center",
+        zIndex: 1000, // Ensure it's above other content
+        background: "linear-gradient(108deg, #2E2E2E 0%, #1F1F1F 100%)",
+        boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.16)",
+        borderRadius: 25,
+        overflow: "auto",
+        border: "1px #525252 solid",
+        display: "flex", // Corresponds to `flex`
+        justifyContent: "center", // Corresponds to `justify-center`
+        alignItems: "center",
+        flexDirection: "column",
+        padding: 20,
+        minWidth: "200px",
+        width: "auto",
+        maxWidth: "700px",
+        minHeight: "100px",
+      }}
+    >
       {!isCompleted && !isError && (
         <>
           <div
@@ -142,7 +165,7 @@ const Loader = ({
 
             <ShareButton
               message="i just minted a MEME using basedMeme generator, guess I'm pretty BASED :)"
-              url={`localhost:3000/nft/${dbId}`}
+              url={`${process.env.NEXT_PUBLIC_HOST_URL}/nft/${dbId}`}
             />
           </div>
         </>
@@ -150,7 +173,24 @@ const Loader = ({
 
       {isError && (
         <>
-          <p style={labelStyles}>{loadingText}</p>
+          <p
+            style={{
+              color: "#fff",
+              minWidth: "300px",
+              width: "auto",
+              maxWidth: "700px",
+              height: "auto", // Height adjusts based on content
+              whiteSpace: "normal", // Allows text to wrap
+              overflowWrap: "break-word",
+              padding: "20px",
+              fontSize: 16,
+              fontFamily: "Inter",
+              fontWeight: "400",
+              wordWrap: "break-word",
+            }}
+          >
+            {loadingText}
+          </p>
         </>
       )}
     </div>

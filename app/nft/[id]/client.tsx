@@ -9,6 +9,7 @@ import { ZoraAbi, getContractFromChainId } from "../../../abi/zoraEdition";
 import { Account } from "@/utils/account";
 import { WalletOptions } from "@/utils/wallet-options";
 import Loader from "@/components/loader";
+import { Address } from "viem";
 
 interface Nft {
   id: string;
@@ -22,13 +23,17 @@ interface Nft {
 export const Post = ({ id }: { id: string }) => {
   const [nft, setNft] = useState<Nft>();
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState("Loading...");
+  const [loadingText, setLoadingText] = useState<string | undefined>(
+    "Loading..."
+  );
   const [dbUpdateDone, setDbUpdateDone] = useState<boolean>(false);
 
   const { isConnected } = useAccount();
   const { data: hash, writeContract, error, isError } = useWriteContract();
   const { address } = useAccount();
-  const { explorer } = getContractFromChainId(5);
+  const { explorer } = getContractFromChainId(
+    Number(process.env.NEXT_PUBLIC_CHAIN_ID)
+  );
 
   function ConnectWallet() {
     return <WalletOptions />;
@@ -100,17 +105,16 @@ export const Post = ({ id }: { id: string }) => {
     let userAddress = address;
 
     writeContract({
-      //   chainId: 8453,
-      address: nft.editionAddress,
+      address: nft?.editionAddress as Address,
       abi: ZoraAbi,
       functionName: "mintWithRewards",
       args: [
-        userAddress,
+        userAddress as Address,
         BigInt(1),
         "Minting a meme onchain, guess im based :)",
-        "0x5371d2E73edf765752121426b842063fbd84f713",
+        nft?.creatorAddress as Address,
       ],
-      enabled: true,
+      // enabled: true,
       value: computeEthToSpend("0", "1").total.toString(),
     });
   };
@@ -132,7 +136,7 @@ export const Post = ({ id }: { id: string }) => {
     }
   };
 
-  const handleModalClick = (e) => {
+  const handleModalClick = (e: any) => {
     e.stopPropagation();
   };
 
@@ -140,12 +144,12 @@ export const Post = ({ id }: { id: string }) => {
     const post = async () => {
       console.log(data);
 
-      let currentMint = nft.mints;
-      const docRef = doc(db, "nfts", nft.id);
+      let currentMint = nft!.mints;
+      const docRef = doc(db, "nfts", nft!.id);
       await updateDoc(docRef, { ...nft, mints: currentMint + 1 });
       setDbUpdateDone(true);
 
-      setNft({ ...nft, mints: currentMint + 1 });
+      setNft({ ...nft, mints: currentMint + 1 } as Nft);
     };
 
     if (isConfirmed) {
@@ -191,12 +195,16 @@ export const Post = ({ id }: { id: string }) => {
 
   useEffect(() => {
     const getData = async () => {
-      const docRef = doc(db, "nfts", id);
+      const docRef = doc(
+        db,
+        String(process.env.NEXT_PUBLIC_FIRESTIRE_ENDPOINT),
+        id
+      );
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
         console.log("Document data:", docSnap.data());
-        setNft({ ...docSnap.data(), id: docSnap.id });
+        setNft({ ...docSnap.data(), id: docSnap.id } as Nft);
       } else {
         // docSnap.data() will be undefined in this case
         console.log("No such document!");
@@ -317,7 +325,7 @@ export const Post = ({ id }: { id: string }) => {
                   </div>
                 )}
 
-                {!isConnected && <ConnectWallet />}
+                {!isConnected && <w3m-button />}
               </div>
 
               <div

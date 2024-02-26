@@ -29,7 +29,9 @@ export const PostInfo = ({ item }: { item: Nft }) => {
   const { address } = useAccount();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
-  const { explorer } = getContractFromChainId(5);
+  const { explorer } = getContractFromChainId(
+    Number(process.env.NEXT_PUBLIC_CHAIN_ID)
+  );
   const [dbUpdateDone, setDbUpdateDone] = useState<boolean>(false);
   const [nft, setNft] = useState<Nft>(item);
 
@@ -127,13 +129,15 @@ export const PostInfo = ({ item }: { item: Nft }) => {
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(`localhost:3000/nft/${nft.id}`);
-    } catch (err) {
+      await navigator.clipboard.writeText(
+        `${process.env.NEXT_PUBLIC_HOST_URL}/nft/${nft.id}`
+      );
+    } catch (err: any) {
       console.log(err.message);
     }
   };
 
-  const ShareIcon = ({ size = 24, color = "currentColor" }) => (
+  const ShareIcon = ({ size = 24, color = "#5A99F2" }) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={size}
@@ -170,7 +174,11 @@ export const PostInfo = ({ item }: { item: Nft }) => {
 
       let currentMint = nft.mints;
 
-      const docRef = doc(db, "nfts", nft.id);
+      const docRef = doc(
+        db,
+        String(process.env.NEXT_PUBLIC_FIRESTIRE_ENDPOINT),
+        nft.id
+      );
 
       await updateDoc(docRef, { ...nft, mints: currentMint + 1 });
 

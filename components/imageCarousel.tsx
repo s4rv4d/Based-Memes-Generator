@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 interface ImageCarouselProps {
   images: string[];
-  onImageSelect: ({ index }: { index: number }) => {};
+  onImageSelect: ({ index }: { index: number }) => void;
   selectedIndex: number;
 }
 

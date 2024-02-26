@@ -9,10 +9,10 @@ interface Nft {
   fileName: string;
 }
 
-export default function Page({ item }: { item: Nft }) {
+export default function Page({ params }: { params: { item: Nft } }) {
   return (
     <div>
-      <PostInfo item={item} />
+      <PostInfo item={params.item} />
     </div>
   );
 }

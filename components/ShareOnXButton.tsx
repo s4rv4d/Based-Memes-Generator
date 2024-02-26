@@ -21,10 +21,9 @@ const ShareButton = ({ message, url }: { message: string; url: string }) => {
         paddingRight: 16,
         paddingTop: 12,
         paddingBottom: 12,
-        background: "#323232",
+        background: "#5A99F2",
         borderRadius: 30,
         overflow: "hidden",
-        border: "1px #525252 solid",
         justifyContent: "center",
         alignItems: "center",
         gap: 10,
@@ -34,7 +33,7 @@ const ShareButton = ({ message, url }: { message: string; url: string }) => {
       <button
         style={{
           textAlign: "center",
-          color: "#5A99F2",
+          color: "white",
           fontSize: 14,
           fontFamily: "Inter",
           fontWeight: "600",

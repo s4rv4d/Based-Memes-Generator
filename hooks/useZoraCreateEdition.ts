@@ -2,6 +2,7 @@ import { uint64MaxSafe } from "../utils/uint64";
 import { z } from "zod";
 import { Decimal } from "decimal.js";
 import { ZoraAbi, getContractFromChainId } from "../abi/zoraEdition";
+import { Address } from "viem";
 
 export const EditionConfig = z.object({
   name: z.string(),
@@ -253,7 +254,9 @@ export type ConfigurableZoraEditionOutput = z.output<
   typeof ConfigurableZoraEditionSchema
 >;
 
-export const flattenContractArgs = (args: ConfigurableZoraEditionOutput) => {
+export const flattenContractArgs = (
+  args: ConfigurableZoraEditionOutput | null
+) => {
   if (!args) return null;
   return Object.entries(args).map(([key, val], idx) => {
     if (key === "saleConfig") return Object.values(val);
@@ -278,7 +281,7 @@ export const generateTokenIdAdjustedContractArgs = (
 
 export function createTestZoraEditionConfig(
   ipfsHash: string,
-  creatorAddress: string
+  creatorAddress: Address
 ): ConfigurableZoraEditionOutput | null {
   // Example test data object
   const testData = {

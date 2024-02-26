@@ -12,6 +12,7 @@ import { db } from "../firebase";
 import { useAccount } from "wagmi";
 import { useEffect } from "react";
 import Loader from "@/components/loader";
+import { Address } from "viem";
 
 import {
   flattenContractArgs,
@@ -20,12 +21,14 @@ import {
 } from "../../hooks/useZoraCreateEdition";
 
 export const CreatePost = () => {
-  const [imageSrc, setImageSrc] = useState(null); // To store the uploaded image source
+  const [imageSrc, setImageSrc] = useState<string | null>(null); // To store the uploaded image source
   const [cid, setCid] = useState("");
   const [args, setArgs] = useState<any[] | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState("Loading...");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loadingText, setLoadingText] = useState<string | undefined>(
+    "Loading..."
+  );
   const [fileName, setFileName] = useState<string>("Based Meme");
   const [dbId, setDbId] = useState<string>("");
   const [dbPushDone, setDbPushDone] = useState<boolean>(false);
@@ -38,7 +41,9 @@ export const CreatePost = () => {
     isError,
   } = useWriteContract();
   const { address } = useAccount();
-  const { creator_contract, explorer } = getContractFromChainId(5);
+  const { creator_contract, explorer } = getContractFromChainId(
+    Number(process.env.NEXT_PUBLIC_CHAIN_ID)
+  );
 
   const [texts, setTexts] = useState([
     {
@@ -75,7 +80,7 @@ export const CreatePost = () => {
     setTexts(updatedTexts);
   };
 
-  const updateTextStyle = (id: number, newStyle) => {
+  const updateTextStyle = (id: number, newStyle: any) => {
     const updatedTexts = texts.map((text) =>
       text.id === id ? { ...text, ...newStyle } : text
     );
@@ -83,14 +88,14 @@ export const CreatePost = () => {
   };
 
   // Function to handle image file upload
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImageSrc(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
+  // const handleImageChange = (e: any) => {
+  //   const file = e.target.files[0];
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     setImageSrc(reader.result);
+  //   };
+  //   reader.readAsDataURL(file);
+  // };
 
   const handleFileNameUpdate = (fileName: string) => {
     setFileName(fileName);
@@ -103,12 +108,12 @@ export const CreatePost = () => {
   };
 
   // On top layout
-  const onResizeFirstLabel = (event, { node, size, handle }) => {
-    setResizeFirstBounds({ width: size.width, height: size.height });
-  };
-  const onResizeSecondLabel = (event, { node, size, handle }) => {
-    setResizeSecondBounds({ width: size.width, height: size.height });
-  };
+  // const onResizeFirstLabel = (event, { node, size, handle }) => {
+  //   setResizeFirstBounds({ width: size.width, height: size.height });
+  // };
+  // const onResizeSecondLabel = (event, { node, size, handle }) => {
+  //   setResizeSecondBounds({ width: size.width, height: size.height });
+  // };
 
   const uploadFile = async (formData: FormData) => {
     setLoadingText("Uploading to IPFS.....");
@@ -131,7 +136,7 @@ export const CreatePost = () => {
     }
   };
 
-  const exportMeme = async (e) => {
+  const exportMeme = async (e: any) => {
     e.preventDefault();
 
     if (memeRef.current) {
@@ -166,9 +171,9 @@ export const CreatePost = () => {
   const createEditionNFT = async (ipfsHash: string) => {
     setLoadingText("Creating NFT Edition.......");
 
-    const args = flattenContractArgs(
+    const args: any = flattenContractArgs(
       generateTokenIdAdjustedContractArgs(
-        createTestZoraEditionConfig(ipfsHash, address),
+        createTestZoraEditionConfig(ipfsHash, address as Address),
         0
       )
     );
@@ -176,25 +181,31 @@ export const CreatePost = () => {
     setArgs(args);
 
     writeContract({
-      // chainId: 8453,
-      address: creator_contract,
+      address: creator_contract as Address,
       abi: ZoraAbi,
       functionName: "createEditionWithReferral",
       args: args,
-      enabled: true,
+      // enabled: true,
     });
   };
 
-  const postNFT = async (createrAddress: string, editionAddress: string) => {
-    const res = await addDoc(collection(db, "nfts"), {
-      creatorAddress: createrAddress,
-      editionAddress: editionAddress,
-      ipfs: `ipfs://${cid}`,
-      mints: 0,
-      fileName: fileName,
-    });
+  const postNFT = async (
+    createrAddress: Address | string,
+    editionAddress: Address | string
+  ) => {
+    const res = await addDoc(
+      collection(db, String(process.env.NEXT_PUBLIC_FIRESTIRE_ENDPOINT)),
+      {
+        creatorAddress: createrAddress,
+        editionAddress: editionAddress,
+        ipfs: `ipfs://${cid}`,
+        mints: 0,
+        fileName: fileName,
+      }
+    );
 
-    return res._key.path.segments[1];
+    console.log(res.id);
+    return res.id;
   };
 
   const {
@@ -210,9 +221,12 @@ export const CreatePost = () => {
   useEffect(() => {
     const post = async () => {
       const creatorAddress = address;
-      const editionAddress = data.logs[0].address;
+      const editionAddress = data?.logs[0].address;
 
-      const res = await postNFT(creatorAddress, editionAddress);
+      const res = await postNFT(
+        creatorAddress as Address,
+        editionAddress as Address
+      );
       setDbId(res);
       setDbPushDone(true);
       setLoadingText("Done");
@@ -262,27 +276,13 @@ export const CreatePost = () => {
     }
   }, [isConfirmed, isError, isReceiptError]);
 
-  // useEffect(() => {
-  //   if (isLoading) {
-  //     // Prevent scrolling on mount
-  //     document.body.style.overflow = "hidden";
-  //   } else {
-  //     // Re-enable scrolling on cleanup
-  //     document.body.style.overflow = "auto";
-  //   }
-  //   // Cleanup function to revert the overflow style back to 'auto' when the component unmounts or showCreate changes
-  //   return () => {
-  //     document.body.style.overflow = "auto";
-  //   };
-  // }, [isLoading]);
-
   const handleOverlayClick = () => {
     if (dbPushDone || isReceiptError || isError) {
       setIsLoading(false);
     }
   };
 
-  const handleModalClick = (e) => {
+  const handleModalClick = (e: any) => {
     e.stopPropagation();
   };
 
@@ -419,6 +419,8 @@ export const CreatePost = () => {
                     color={text.color}
                     fontSize={text.fontSize}
                     fontName={text.fontName}
+                    onDragStop={null}
+                    onResizeStop={null}
                   />
                 ))}
               </div>
@@ -539,7 +541,7 @@ export const CreatePost = () => {
                     boxSizing: "border-box",
                   }}
                 >
-                  <img src="base-logo.png" alt="baseLogo" layout="fill" />
+                  <img src="base-logo.png" alt="baseLogo" />
 
                   <button
                     onClick={exportMeme}

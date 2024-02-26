@@ -20,6 +20,7 @@ const config: Config = {
         "custom-black": "#1C1C1C", // Use your own color hex code
         "create-form-bg": "#323232",
         "new-create-bg": "#525252",
+        "custom-blue": "#5A99F2",
       },
     },
   },

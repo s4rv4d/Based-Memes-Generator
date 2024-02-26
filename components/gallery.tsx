@@ -21,7 +21,9 @@ export default function Gallery() {
   const [selectedPost, setSelectedPost] = useState<Nft | null>(null);
 
   useEffect(() => {
-    const q = query(collection(db, "nfts"));
+    const q = query(
+      collection(db, String(process.env.NEXT_PUBLIC_FIRESTIRE_ENDPOINT))
+    );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let itemsArray: Nft[] = [];
       console.log(querySnapshot);
@@ -93,7 +95,7 @@ export default function Gallery() {
                 padding: "2rem", // Converts 'p-4' assuming 1rem = 16px, and '4' in Tailwind corresponds to 1rem
               }}
             >
-              <div className="columns-1 gap-5 sm:columns-2 sm:gap-8 md:columns-3 lg:columns-4">
+              <div className="columns-4 gap-5 sm:columns-2 sm:gap-8 md:columns-3 lg:columns-4">
                 {nfts.map((nft, index) => (
                   <NFTPost
                     key={index}
@@ -127,7 +129,7 @@ export default function Gallery() {
           onClick={handleOverlayClick}
         >
           <div onClick={handleModalClick}>
-            <Page item={selectedPost} />
+            <Page params={{ item: selectedPost }} />
           </div>
         </div>
       )}
