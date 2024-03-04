@@ -13,13 +13,21 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   selectedIndex,
 }) => {
   return (
-    <div className="flex overflow-x-auto w-full new-create-bg">
+    <div
+      // className="lg:w-100 w-1/2"
+      style={{
+        display: "flex",
+        overflowX: "auto",
+        // width: "auto",
+        // margin: "auto",
+      }}
+    >
       {images.map((image, index) => (
         <img
           key={index}
           src={image}
           alt={`Carousel image ${index}`}
-          className="flex-shrink-0 object-cover"
+          className="flex-shrink-0 object-cover overflow-x-hidden"
           style={{
             height: "5rem",
             border: index === selectedIndex ? "2px solid white" : "none",

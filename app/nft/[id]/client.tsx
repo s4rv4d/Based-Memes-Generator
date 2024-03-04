@@ -145,7 +145,11 @@ export const Post = ({ id }: { id: string }) => {
       console.log(data);
 
       let currentMint = nft!.mints;
-      const docRef = doc(db, "nfts", nft!.id);
+      const docRef = doc(
+        db,
+        String(process.env.NEXT_PUBLIC_FIRESTIRE_ENDPOINT),
+        nft!.id
+      );
       await updateDoc(docRef, { ...nft, mints: currentMint + 1 });
       setDbUpdateDone(true);
 
@@ -252,7 +256,7 @@ export const Post = ({ id }: { id: string }) => {
                     style={{
                       color: "#CDCDD0",
                       fontSize: 20,
-                      fontFamily: "Inter",
+                      // fontFamily: "Public Sans",
                       fontWeight: "600",
                       wordWrap: "break-word",
                     }}
@@ -264,7 +268,7 @@ export const Post = ({ id }: { id: string }) => {
                       style={{
                         color: "#A6A6B0",
                         fontSize: 14,
-                        fontFamily: "Inter",
+                        // fontFamily: "Public Sans",
                         fontWeight: "400",
                         // lineHeight: 18,
                         wordWrap: "break-word",
@@ -276,7 +280,7 @@ export const Post = ({ id }: { id: string }) => {
                       style={{
                         color: "#A6A6B0",
                         fontSize: 14,
-                        fontFamily: "Inter",
+                        // fontFamily: "Public Sans",
                         fontWeight: "600",
                         // lineHeight: 18,
                         wordWrap: "break-word",
@@ -312,7 +316,7 @@ export const Post = ({ id }: { id: string }) => {
                         textAlign: "center",
                         color: "#5A99F2",
                         fontSize: 14,
-                        fontFamily: "Inter",
+                        // fontFamily: "Public Sans",
                         fontWeight: "600",
                         wordWrap: "break-word",
                       }}

@@ -29,8 +29,9 @@ const NFTPost = ({
     <div
       key={index}
       style={{
-        // width: "auto",
-        // height: "auto",
+        width: "auto",
+        maxWidth: "350px",
+        height: "auto",
         padding: 20,
         background: "linear-gradient(108deg, #2E2E2E 0%, #1F1F1F 100%)",
         boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.16)",
@@ -58,7 +59,7 @@ const NFTPost = ({
           style={{
             color: "#CDCDD0",
             fontSize: 16,
-            fontFamily: "Inter",
+            // fontFamily: "Public Sans",
             fontWeight: "600",
             wordWrap: "break-word",
           }}
@@ -70,7 +71,7 @@ const NFTPost = ({
             style={{
               color: "#A6A6B0",
               fontSize: 12,
-              fontFamily: "Inter",
+              // fontFamily: "Public Sans",
               fontWeight: "400",
               wordWrap: "break-word",
             }}
@@ -81,7 +82,7 @@ const NFTPost = ({
             style={{
               color: "#A6A6B0",
               fontSize: 12,
-              fontFamily: "Inter",
+              // fontFamily: "Public Sans",
               fontWeight: "600",
               wordWrap: "break-word",
             }}

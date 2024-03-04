@@ -60,7 +60,7 @@ const Loader = ({
     overflowWrap: "break-word",
     padding: "20px",
     fontSize: 16,
-    fontFamily: "Inter",
+    // fontFamily: "Public Sans",
     fontWeight: "400",
     wordWrap: "break-word",
   };
@@ -114,7 +114,7 @@ const Loader = ({
               margin: "20px",
               color: "#fff",
               fontSize: 20,
-              fontFamily: "Inter",
+              // fontFamily: "Public Sans",
               fontWeight: "500",
               wordWrap: "break-word",
             }}
@@ -152,7 +152,7 @@ const Loader = ({
                   textAlign: "center",
                   color: "#5A99F2",
                   fontSize: 14,
-                  fontFamily: "Inter",
+                  // fontFamily: "Public Sans",
                   fontWeight: "600",
                   wordWrap: "break-word",
                 }}
@@ -184,7 +184,7 @@ const Loader = ({
               overflowWrap: "break-word",
               padding: "20px",
               fontSize: 16,
-              fontFamily: "Inter",
+              // fontFamily: "Public Sans",
               fontWeight: "400",
               wordWrap: "break-word",
             }}

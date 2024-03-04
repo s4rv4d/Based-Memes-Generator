@@ -35,7 +35,7 @@ const ShareButton = ({ message, url }: { message: string; url: string }) => {
           textAlign: "center",
           color: "white",
           fontSize: 14,
-          fontFamily: "Inter",
+          // fontFamily: "Public Sans",
           fontWeight: "600",
           wordWrap: "break-word",
         }}

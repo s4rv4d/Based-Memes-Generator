@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import { useState, useRef } from "react";
 import html2canvas from "html2canvas";
@@ -13,6 +15,12 @@ import { useAccount } from "wagmi";
 import { useEffect } from "react";
 import Loader from "@/components/loader";
 import { Address } from "viem";
+import ImageOverlay from "@/components/ImageOverlay";
+
+import dynamic from "next/dynamic";
+const MediaQuery = dynamic(() => import("react-responsive"), {
+  ssr: false,
+});
 
 import {
   flattenContractArgs,
@@ -32,6 +40,9 @@ export const CreatePost = () => {
   const [fileName, setFileName] = useState<string>("Based Meme");
   const [dbId, setDbId] = useState<string>("");
   const [dbPushDone, setDbPushDone] = useState<boolean>(false);
+  const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [isResizable, setIsResizable] = useState<boolean>(true);
+  const [isFinal, setIsFinal] = useState<boolean>(false);
 
   const {
     data: hash,
@@ -45,16 +56,8 @@ export const CreatePost = () => {
     Number(process.env.NEXT_PUBLIC_CHAIN_ID)
   );
 
-  const [texts, setTexts] = useState([
-    {
-      id: 1,
-      text: "Your Text Here",
-      fontName: "Impact",
-      fontSize: "30",
-      color: "#FFFFFF",
-    },
-    // Add more items as needed
-  ]);
+  const [texts, setTexts] = useState([]);
+  const [images, setImages] = useState([]);
 
   // function to create new texts
   const addText = () => {
@@ -73,29 +76,22 @@ export const CreatePost = () => {
   const imageRef = useRef(null);
   const memeRef = useRef(null);
 
-  const updateText = (id: number, newText: string) => {
-    const updatedTexts = texts.map((text) =>
-      text.id === id ? { ...text, text: newText } : text
-    );
-    setTexts(updatedTexts);
-  };
-
-  const updateTextStyle = (id: number, newStyle: any) => {
-    const updatedTexts = texts.map((text) =>
-      text.id === id ? { ...text, ...newStyle } : text
-    );
-    setTexts(updatedTexts);
-  };
-
   // Function to handle image file upload
-  // const handleImageChange = (e: any) => {
-  //   const file = e.target.files[0];
-  //   const reader = new FileReader();
-  //   reader.onloadend = () => {
-  //     setImageSrc(reader.result);
-  //   };
-  //   reader.readAsDataURL(file);
-  // };
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const newImage = {
+        id: images.length + 1,
+        src: reader.result,
+      };
+
+      console.log(e.target.files[0]);
+
+      setImages([...images, newImage]);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleFileNameUpdate = (fileName: string) => {
     setFileName(fileName);
@@ -106,14 +102,6 @@ export const CreatePost = () => {
     setImageSrc(file);
     setSelectedIndex(index);
   };
-
-  // On top layout
-  // const onResizeFirstLabel = (event, { node, size, handle }) => {
-  //   setResizeFirstBounds({ width: size.width, height: size.height });
-  // };
-  // const onResizeSecondLabel = (event, { node, size, handle }) => {
-  //   setResizeSecondBounds({ width: size.width, height: size.height });
-  // };
 
   const uploadFile = async (formData: FormData) => {
     setLoadingText("Uploading to IPFS.....");
@@ -345,221 +333,231 @@ export const CreatePost = () => {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex", // Corresponds to `flex`
-          justifyContent: "center", // Corresponds to `justify-center`
-          alignItems: "center", // Corresponds to `items-center`
-          height: "100vh", // Corresponds to `h-screen`, which sets the height to the full height of the viewport
-        }}
-      >
-        <div
-          style={{
-            padding: 20,
-            background: "linear-gradient(108deg, #2E2E2E 0%, #1F1F1F 100%)",
-            boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.16)",
-            borderRadius: 25,
-            overflow: "hidden",
-            border: "1px #525252 solid", // shadow-xl, this is an approximation since Tailwind's shadows are predefined
-            margin: "2rem auto", // mx-auto centers the element, my-8 applies vertical margin, translating to 2rem (32px) top and bottom
-            maxWidth: "80rem", // max-w-7xl, Tailwind's max width classes are predefined, 112rem is an approximation for 7xl
-            maxHeight: "40rem",
-          }}
-        >
-          {/* image carousel part */}
-          <ImageCarousel
-            images={imageArray}
-            onImageSelect={handleCarouselSelection}
-            selectedIndex={selectedIndex}
-          />
-
+      <div className="flex  items-center justify-center overflow-auto">
+        <div className="w-1/2 h-1/2">
           <div
+            className="inline-block flex flex-col justify-center overflow-hidden gap-4 p-4"
             style={{
-              display: "flex", // Corresponds to `flex`
-              width: "100%", // Corresponds to `w-full`, making the element's width 100% of its parent's width
-              maxWidth: "96rem", // Corresponds to `max-w-6xl`, Tailwind's predefined max width for 6xl (this conversion assumes the default Tailwind base font size of 16px, where 1rem = 16px, so 96rem would be 1536px)
-              margin: "0 auto", // Corresponds to `mx-auto`, centers the element horizontally within its parent
-              gap: "20px", // Adds 20px gap between each flex item
-              maxHeight: "30rem",
+              background: "linear-gradient(108deg, #2E2E2E 0%, #1F1F1F 100%)",
+              boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.16)",
+              borderRadius: 25,
+              overflow: "hidden",
+              border: "1px #525252 solid",
+              position: "relative",
             }}
           >
-            {/* Meme editor content */}
             <div
               style={{
-                flex: 1, // Corresponds to `flex-1`, which means the element can grow and shrink, with a flex-basis of 0%
-                display: "flex", // Corresponds to `flex`, making the element a flex container
-                justifyContent: "center", // Corresponds to `justify-center`, centers children along the main axis (horizontally for a row direction)
-                alignItems: "center", // Corresponds to `items-center`, centers children along the cross axis (vertically for a row direction)
-                position: "relative", // Corresponds to `relative`, positions the element relative to its normal position
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              <div
-                ref={memeRef}
+              <h1
                 style={{
-                  position: "relative", // Corresponds to `relative`, which sets the element's position to relative
-                  userSelect: "none", // Corresponds to `user-select-none`, which prevents text selection
+                  color: "white", // text-white translates to setting the text color to white
+                  fontSize: "40px",
+                  // marginLeft: "16px",
                 }}
               >
-                <img
-                  ref={imageRef}
-                  src={imageSrc === null ? imageArray[0] : imageSrc}
+                {fileName}
+              </h1>
+
+              <div className="flex flex-row gap-4">
+                <button
                   style={{
-                    width: "auto", // Corresponds to `w-auto`, allowing the element's width to adjust based on its content up to its container's width
-                    maxWidth: "100%", // Corresponds to `max-w-full`, ensuring the element's maximum width does not exceed the width of its container
-                    height: "30rem", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
-                    maxHeight: "80%",
-                    borderRadius: 8, // Corresponds to `max-h-full`, ensuring the element's maximum height does not exceed the height of its container
+                    width: "40px",
+                    height: "40px",
+                    background: "transparent",
+                    border: "1px #525252 solid",
+                    borderRadius: "4px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: "4px",
                   }}
+                  onClick={addText}
+                >
+                  <img
+                    src="add_text.svg"
+                    alt="text"
+                    // style={{ height: "38px", width: "38px" }}
+                  />
+                </button>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  style={{ display: "none" }}
+                  id="fileInput"
                 />
 
-                {texts.map((text) => (
-                  <TextOverlay
-                    key={text.id}
-                    text={text.text}
-                    color={text.color}
-                    fontSize={text.fontSize}
-                    fontName={text.fontName}
-                    onDragStop={null}
-                    onResizeStop={null}
+                {/* Image button for selecting file */}
+                <label
+                  htmlFor="fileInput"
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    background: "transparent",
+                    border: "1px #525252 solid",
+                    borderRadius: "4px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: "4px",
+                  }}
+                >
+                  <img
+                    src="add_image.svg" // Path to your image button
+                    alt="Upload Image"
+                    style={{
+                      cursor: "pointer",
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                    }}
                   />
-                ))}
+                </label>
+
+                <button
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    background: "transparent",
+                    border: "1px #525252 solid",
+                    borderRadius: "4px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    padding: "4px",
+                  }}
+                  onClick={() => {
+                    setIsEditable((prev) => !prev);
+                    setIsResizable((prev) => !prev);
+                  }}
+                >
+                  <img
+                    src="settings.svg"
+                    alt="text"
+                    // style={{ height: "38px", width: "38px" }}
+                  />
+                </button>
               </div>
             </div>
 
-            {/* side bar stuff */}
-            <div
-              style={{
-                borderRadius: "8px",
-                border: "2px solid #525252",
-                width: "28%", // w-1/3 translates to 33.333333% width of its parent
-                backgroundColor: "#323232", // Replace '#yourColorCode' with the actual color value for 'bg-create-form-bg'
-                padding: "1rem", // p-4 translates to padding of 1rem (16px if the base font size is 16px)
-                overflowY: "auto", // overflow-y-auto enables vertical scrolling if the content overflows the element's height
-                height: "auto", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
-                maxHeight: "100%",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  flexDirection: "column",
-                  height: "100%",
-                }}
-              >
-                <div style={{ marginBottom: "10px" }}>
-                  <h1
-                    style={{
-                      color: "white", // text-white translates to setting the text color to white
-                      fontSize: "2rem", // text-xl translates to a font size of 1.25rem (20px if the base font size is 16px)
-                      marginBottom: "2rem", // mb-4 translates to a margin-bottom of 1rem (16px if the base font size is 16px)
-                    }}
-                  >
-                    Create your meme
-                  </h1>
-                  <div
-                    style={{
-                      marginBottom: "1rem",
-                      height: "auto", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
-                      maxHeight: "40%",
-                    }}
-                  >
-                    <div
-                      style={{
-                        background: "#424242",
-                        borderRadius: "4px",
-                        border: "2px solid #525252",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      <input
-                        type="text"
-                        placeholder="Meme name"
-                        onChange={(e) => {
-                          handleFileNameUpdate(e.target.value);
-                        }}
-                        value={fileName}
-                        style={{
-                          color: "#FFFFFF",
-                          height: "40px",
-                          width: "100%",
-                          background: "#424242",
-                          paddingLeft: "16px",
-                        }}
-                      />
-                    </div>
-
-                    {texts.map((text) => (
-                      <CustomTextInput
-                        key={text.id}
-                        text={text.text}
-                        onTextChange={(newText) => updateText(text.id, newText)}
-                        onStyleChange={(newStyle) =>
-                          updateTextStyle(text.id, newStyle)
-                        }
-                        style={{
-                          fontName: text.fontName,
-                          fontSize: text.fontSize,
-                          color: text.color,
-                        }}
-                      />
-                    ))}
-
-                    <button
-                      onClick={addText}
-                      style={{
-                        textAlign: "center",
-                        color: "#5A99F2",
-                        fontSize: 14,
-                        fontFamily: "Inter",
-                        fontWeight: "600",
-                        wordWrap: "break-word",
-                      }}
-                    >
-                      Add text +
-                    </button>
-                  </div>
-                </div>
-
+            <div className="">
+              {/* Meme editor content */}
+              <div>
                 <div
+                  className="flex items-center justify-center "
+                  ref={memeRef}
                   style={{
-                    marginTop: "auto",
-                    marginBottom: "12px",
-                    paddingLeft: 32,
-                    paddingRight: 32,
-                    paddingTop: 12,
-                    paddingBottom: 12,
-                    background: "#0252FF",
-                    borderRadius: 30,
-                    overflow: "hidden",
-                    border: "1px #525252 solid",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: 10,
-                    display: "inline-flex",
-                    height: "50px",
-                    boxSizing: "border-box",
+                    userSelect: "none",
+                    margin: "16px",
                   }}
                 >
-                  <img src="base-logo.png" alt="baseLogo" />
-
-                  <button
-                    onClick={exportMeme}
+                  <img
+                    ref={imageRef}
+                    src={imageSrc === null ? imageArray[0] : imageSrc}
                     style={{
-                      textAlign: "center",
-                      color: "white",
-                      fontSize: 14,
-                      fontFamily: "Inter",
-                      fontWeight: "600",
-                      wordWrap: "break-word",
-                      height: "50px",
+                      borderRadius: 8,
+                      width: "450px",
+                      maxHeight: "500px",
+                      height: "auto",
                     }}
-                    disabled={fileName.length === 0}
-                  >
-                    Mint a Meme NFT
-                  </button>
+                    draggable="false"
+                  />
+
+                  {texts.map((text) => (
+                    <TextOverlay
+                      key={text.id}
+                      text={text.text}
+                      color={text.color}
+                      fontSize={text.fontSize}
+                      fontName={text.fontName}
+                      onDragStop={null}
+                      onResizeStop={null}
+                      isEditable={isEditable}
+                      isResizable={isResizable}
+                      isFinal={isFinal}
+                    />
+                  ))}
+
+                  {images.map((image) => (
+                    <ImageOverlay
+                      key={image.id}
+                      src={image.src}
+                      isEditable={isEditable}
+                      isResizable={isResizable}
+                      isFinal={isFinal}
+                    />
+                  ))}
                 </div>
               </div>
+            </div>
+
+            {/* image carousel part */}
+            <ImageCarousel
+              images={imageArray}
+              onImageSelect={handleCarouselSelection}
+              selectedIndex={selectedIndex}
+            />
+
+            <input
+              type="text"
+              placeholder="Meme name"
+              onChange={(e) => {
+                handleFileNameUpdate(e.target.value);
+              }}
+              value={fileName}
+              style={{
+                color: "#FFFFFF",
+                height: "50px",
+                width: "100%",
+                background: "#424242",
+                border: "1px #525252 solid",
+                borderRadius: "12px",
+                paddingLeft: "16px",
+              }}
+            />
+
+            <div
+              style={{
+                marginTop: "auto",
+                marginBottom: "12px",
+                paddingLeft: 32,
+                paddingRight: 32,
+                paddingTop: 12,
+                paddingBottom: 12,
+                background: "#0252FF",
+                borderRadius: "12px",
+                overflow: "hidden",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 10,
+                display: "inline-flex",
+                height: "50px",
+                boxSizing: "border-box",
+              }}
+            >
+              <img src="base-logo.png" alt="baseLogo" />
+
+              <button
+                onClick={exportMeme}
+                style={{
+                  textAlign: "center",
+                  color: "white",
+                  fontSize: 14,
+                  // fontFamily: "Public Sans",
+                  fontWeight: "600",
+                  wordWrap: "break-word",
+                  height: "50px",
+                }}
+                disabled={fileName.length === 0}
+              >
+                Mint a Meme NFT
+              </button>
             </div>
           </div>
         </div>

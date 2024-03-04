@@ -23,26 +23,25 @@ export default function Hero({
               style={{
                 color: "white",
                 fontSize: 40,
-                fontFamily: "Inter",
+                // fontFamily: "Public Sans",
                 fontWeight: "700",
                 lineHeight: "50px",
                 wordWrap: "break-word",
               }}
             >
-              Craft Your Humour, Mint Your NFT
+              Become a Meme Intern
             </h1>
             <p
               style={{
                 color: "white",
                 fontSize: 18,
-                fontFamily: "Inter",
+                // fontFamily: "Public Sans",
                 fontWeight: "400",
                 lineHeight: "27px",
                 wordWrap: "break-word",
               }}
             >
-              Transform Your Wit into Digital Art with Our Playful Crypto
-              Creation Platform!
+              Create memes, earn ETH, climb the corporate ladder
             </p>
           </div>
           <div className="flex justify-center">
@@ -70,7 +69,7 @@ export default function Hero({
                   textAlign: "center",
                   color: "white",
                   fontSize: 16,
-                  fontFamily: "Inter",
+                  // fontFamily: "Public Sans",
                   fontWeight: "600",
                   lineHeight: 24,
                   wordWrap: "break-word",

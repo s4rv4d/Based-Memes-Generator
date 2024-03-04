@@ -1,0 +1,39 @@
+.resize-handle-bottom-right {
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  bottom: -5px;
+  right: -5px;
+  cursor: se-resize;
+  /* border-radius: 12px; */
+}
+
+.resize-handle-bottom-left {
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  bottom: -5px;
+  left: -5px;
+  cursor: sw-resize;
+  /* border-radius: 12px; */
+}
+
+.resize-handle-top-left {
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  top: -5px;
+  left: -5px;
+  cursor: nw-resize;
+  /* border-radius: 12px; */
+}
+
+.resize-handle-top-right {
+  width: 16px;
+  height: 16px;
+  background-color: #fff;
+  top: -5px;
+  right: -5px;
+  cursor: ne-resize;
+  /* border-radius: 12px; */
+}

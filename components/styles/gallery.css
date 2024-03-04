@@ -3,21 +3,9 @@
   height: auto;
   object-fit: contain;
 }
-
-/* Example of a media query for larger screens */
+/* 
 @media (min-width: 1024px) {
   .nft-image {
-    width: 100%; /* Make the image fill the container */
+    width: 100%;
   }
-}
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer utilities {
-  .auto-rows-auto {
-    /* Ensures the row height is based on the content */
-    grid-auto-rows: auto;
-  }
-}
+} */

@@ -27,6 +27,7 @@ export const PostInfo = ({ item }: { item: Nft }) => {
     isError,
   } = useWriteContract();
   const { address } = useAccount();
+  const { isConnected } = useAccount();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
   const { explorer } = getContractFromChainId(
@@ -263,7 +264,7 @@ export const PostInfo = ({ item }: { item: Nft }) => {
                 style={{
                   color: "#CDCDD0",
                   fontSize: 20,
-                  fontFamily: "Inter",
+                  // fontFamily: "Public Sans",
                   fontWeight: "600",
                   wordWrap: "break-word",
                 }}
@@ -275,7 +276,7 @@ export const PostInfo = ({ item }: { item: Nft }) => {
                   style={{
                     color: "#A6A6B0",
                     fontSize: 14,
-                    fontFamily: "Inter",
+                    // fontFamily: "Public Sans",
                     fontWeight: "400",
                     wordWrap: "break-word",
                   }}
@@ -286,7 +287,7 @@ export const PostInfo = ({ item }: { item: Nft }) => {
                   style={{
                     color: "#A6A6B0",
                     fontSize: 14,
-                    fontFamily: "Inter",
+                    // fontFamily: "Public Sans",
                     fontWeight: "600",
                     wordWrap: "break-word",
                   }}
@@ -301,49 +302,53 @@ export const PostInfo = ({ item }: { item: Nft }) => {
               </div>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <ShareIcon />
+            {isConnected && (
               <div
                 style={{
-                  paddingLeft: 32,
-                  paddingRight: 32,
-                  paddingTop: 12,
-                  paddingBottom: 12,
-                  background: "#323232",
-                  borderRadius: 30,
-                  overflow: "hidden",
-                  border: "1px #525252 solid",
+                  display: "flex",
+                  flexDirection: "row",
                   justifyContent: "center",
                   alignItems: "center",
-                  gap: 10,
-                  display: "inline-flex",
+                  gap: "10px",
                 }}
               >
-                <button
+                <ShareIcon />
+                <div
                   style={{
-                    textAlign: "center",
-                    color: "#5A99F2",
-                    fontSize: 14,
-                    fontFamily: "Inter",
-                    fontWeight: "600",
-                    wordWrap: "break-word",
-                  }}
-                  onClick={() => {
-                    mintEditionNFT();
+                    paddingLeft: 32,
+                    paddingRight: 32,
+                    paddingTop: 12,
+                    paddingBottom: 12,
+                    background: "#323232",
+                    borderRadius: 30,
+                    overflow: "hidden",
+                    border: "1px #525252 solid",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 10,
+                    display: "inline-flex",
                   }}
                 >
-                  Mint
-                </button>
+                  <button
+                    style={{
+                      textAlign: "center",
+                      color: "#5A99F2",
+                      fontSize: 14,
+                      // fontFamily: "Public Sans",
+                      fontWeight: "600",
+                      wordWrap: "break-word",
+                    }}
+                    onClick={() => {
+                      mintEditionNFT();
+                    }}
+                  >
+                    Mint
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
+
+            {!isConnected && <w3m-button />}
           </div>
 
           <div

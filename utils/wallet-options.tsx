@@ -31,7 +31,7 @@ function WalletOption({ onClick }: { onClick: () => void }) {
           textAlign: "center",
           color: "#5A99F2",
           fontSize: 14,
-          fontFamily: "Inter",
+          // fontFamily: "Public Sans",
           fontWeight: "600",
           wordWrap: "break-word",
         }}

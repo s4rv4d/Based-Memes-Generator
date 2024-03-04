@@ -2,12 +2,12 @@ import { Metadata } from "next";
 import { cookieToInitialState } from "wagmi";
 import { config } from "@/config";
 import ContextProvider from "@/context";
-import { Inter } from "next/font/google";
+import { Public_Sans } from "next/font/google";
 import { headers } from "next/headers";
 import fetchDoc from "@/utils/fetchDoc";
 import { parseIpfsUrl } from "@/hooks/useZoraCreateEdition";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Public_Sans({ subsets: ["latin"] });
 
 interface Nft {
   id: string;

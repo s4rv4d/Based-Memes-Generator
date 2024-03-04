@@ -7,7 +7,7 @@ export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_ID;
 if (!projectId) throw new Error("Project ID is not defined");
 
 export const config = createConfig({
-  chains: [goerli, base],
+  chains: [goerli],
   connectors: [
     injected(),
     walletConnect({
@@ -21,6 +21,6 @@ export const config = createConfig({
   }),
   transports: {
     [goerli.id]: http(),
-    [base.id]: http(),
+    // [base.id]: http(),
   },
 });
