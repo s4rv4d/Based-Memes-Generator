@@ -24,8 +24,8 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({
   const [state, setState] = useState<SizeState>({
     x: 0,
     y: 0,
-    width: 200,
-    height: 200,
+    width: 100,
+    height: 100,
   });
 
   console.log(src);
@@ -34,19 +34,21 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({
     <>
       {/* {!isFinal && ( */}
       <Rnd
+        default={{
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 100,
+        }}
         style={{
-          overflow: "clip",
+          // overflow: "clip",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
         size={{
           width: `${state.width}px`,
-          height: state.height,
-        }}
-        position={{ x: state.x, y: state.y }}
-        onDragStop={(e, d) => {
-          setState((prevState) => ({ ...prevState, x: d.x, y: d.y }));
+          height: `${state.height}px`,
         }}
         onResizeStop={(e, direction, ref, delta, position) => {
           setState({
@@ -68,7 +70,12 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({
           src={src}
           alt="imageOverlay"
           draggable="false"
-          style={{ width: state.width, height: state.height, cursor: "move" }}
+          style={{
+            width: `${state.width}px`,
+            height: `auto`,
+            cursor: "move",
+            overflow: "hidden",
+          }}
           // style={{ maxWidth: "100%" }}
         />
       </Rnd>

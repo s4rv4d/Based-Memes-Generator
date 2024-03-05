@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./styles/loader.css";
 import { useWaitForTransactionReceipt } from "wagmi";
 import ShareButton from "./ShareOnXButton";
+import ShareWarp from "./ShareOnWarpButton";
 
 const Loader = ({
   loadingText,
@@ -163,10 +164,15 @@ const Loader = ({
               </a>
             </div>
 
-            <ShareButton
+            <ShareWarp
               message="i just minted a MEME using basedMeme generator, guess I'm pretty BASED :)"
               url={`${process.env.NEXT_PUBLIC_HOST_URL}/nft/${dbId}`}
             />
+
+            {/* <ShareButton
+              message="i just minted a MEME using basedMeme generator, guess I'm pretty BASED :)"
+              url={`${process.env.NEXT_PUBLIC_HOST_URL}/nft/${dbId}`}
+            /> */}
           </div>
         </>
       )}

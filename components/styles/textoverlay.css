@@ -1,6 +1,6 @@
 .resize-handle-bottom-right {
-  width: 16px;
-  height: 16px;
+  width: 10px;
+  height: 10px;
   background-color: #fff;
   bottom: -5px;
   right: -5px;
@@ -9,8 +9,8 @@
 }
 
 .resize-handle-bottom-left {
-  width: 16px;
-  height: 16px;
+  width: 10px;
+  height: 10px;
   background-color: #fff;
   bottom: -5px;
   left: -5px;
@@ -19,8 +19,8 @@
 }
 
 .resize-handle-top-left {
-  width: 16px;
-  height: 16px;
+  width: 10px;
+  height: 10px;
   background-color: #fff;
   top: -5px;
   left: -5px;
@@ -29,8 +29,8 @@
 }
 
 .resize-handle-top-right {
-  width: 16px;
-  height: 16px;
+  width: 10px;
+  height: 10px;
   background-color: #fff;
   top: -5px;
   right: -5px;

@@ -1,6 +1,9 @@
 import * as React from "react";
 import { Connector, useConnect } from "wagmi";
 import { injected } from "wagmi/connectors";
+import { Public_Sans } from "next/font/google";
+
+const inter = Public_Sans({ subsets: ["latin"] });
 
 export function WalletOptions() {
   const { connectors, connect } = useConnect();
@@ -11,25 +14,26 @@ export function WalletOptions() {
 function WalletOption({ onClick }: { onClick: () => void }) {
   return (
     <div
+      className={inter.className}
       style={{
         paddingLeft: 32,
         paddingRight: 32,
         paddingTop: 12,
         paddingBottom: 12,
-        background: "#323232",
+        background: "#0252FF",
         borderRadius: 30,
         overflow: "hidden",
-        border: "1px #525252 solid",
         justifyContent: "center",
         alignItems: "center",
         gap: 10,
-        display: "inline-flex",
+        display: "flex",
+        flex: "1",
       }}
     >
       <button
         style={{
           textAlign: "center",
-          color: "#5A99F2",
+          color: "white",
           fontSize: 14,
           // fontFamily: "Public Sans",
           fontWeight: "600",

@@ -16,17 +16,17 @@ import { useEffect } from "react";
 import Loader from "@/components/loader";
 import { Address } from "viem";
 import ImageOverlay from "@/components/ImageOverlay";
-
-import dynamic from "next/dynamic";
-const MediaQuery = dynamic(() => import("react-responsive"), {
-  ssr: false,
-});
+import { saveAs } from "file-saver";
+import { Public_Sans } from "next/font/google";
+import { WalletOptions } from "@/utils/wallet-options";
 
 import {
   flattenContractArgs,
   generateTokenIdAdjustedContractArgs,
   createTestZoraEditionConfig,
 } from "../../hooks/useZoraCreateEdition";
+
+const inter = Public_Sans({ subsets: ["latin"] });
 
 export const CreatePost = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null); // To store the uploaded image source
@@ -43,6 +43,10 @@ export const CreatePost = () => {
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isResizable, setIsResizable] = useState<boolean>(true);
   const [isFinal, setIsFinal] = useState<boolean>(false);
+  const [dowFinal, setDwFinal] = useState<boolean>(false);
+  const [mintFinal, setMintFinal] = useState<boolean>(false);
+
+  // https://warpcast.com/~/compose?text=Hello%20world!
 
   const {
     data: hash,
@@ -51,7 +55,7 @@ export const CreatePost = () => {
     error,
     isError,
   } = useWriteContract();
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
   const { creator_contract, explorer } = getContractFromChainId(
     Number(process.env.NEXT_PUBLIC_CHAIN_ID)
   );
@@ -71,6 +75,8 @@ export const CreatePost = () => {
       color: "#FFFFFF",
     };
     setTexts([...texts, newText]);
+    setIsFinal(false);
+    setIsEditable(false);
   };
 
   const imageRef = useRef(null);
@@ -88,6 +94,8 @@ export const CreatePost = () => {
 
       console.log(e.target.files[0]);
 
+      setIsFinal(false);
+      setIsEditable(false);
       setImages([...images, newImage]);
     };
     reader.readAsDataURL(file);
@@ -124,37 +132,80 @@ export const CreatePost = () => {
     }
   };
 
+  const downloadImage = async (e: any) => {
+    e.preventDefault();
+    setIsFinal(true);
+    setIsEditable(true);
+    setDwFinal(true);
+  };
+
+  useEffect(() => {
+    if (dowFinal) {
+      if (memeRef.current) {
+        html2canvas(document.getElementById("imageWithText"), {
+          backgroundColor: null,
+          useCORS: true,
+          scale: 1,
+        })
+          .then(async (canvas) => {
+            const dataURL = canvas.toDataURL();
+
+            // Create a temporary link element
+            const link = document.createElement("a");
+            link.href = dataURL;
+            link.download = "basedMeme.png"; // Filename
+            link.click();
+          })
+          .then(() => {
+            setDwFinal(false);
+          });
+      }
+    }
+  }, [dowFinal]);
+
   const exportMeme = async (e: any) => {
     e.preventDefault();
-
-    if (memeRef.current) {
-      html2canvas(memeRef.current, { backgroundColor: null }).then(
-        async (canvas) => {
-          canvas.toBlob(async (blob) => {
-            if (blob) {
-              // Convert the blob to a File object
-              const fileName = "meme.png"; // Specify the filename
-              const mimeType = "image/png"; // Specify the MIME type
-              const file: File = new File([blob], fileName, { type: mimeType });
-
-              const formData = new FormData();
-              formData.append("file", file, file.name); // Append the file
-              formData.append("name", "Based Meme");
-              formData.append(
-                "description",
-                "meme generaterated using basedMeme"
-              );
-
-              setIsLoading(true);
-              setLoadingText("Generating meme.....");
-
-              await uploadFile(formData);
-            }
-          }, "image/png");
-        }
-      );
-    }
+    setIsFinal(true);
+    setIsEditable(true);
+    setMintFinal(true);
   };
+
+  useEffect(() => {
+    if (mintFinal) {
+      if (memeRef.current) {
+        html2canvas(document.getElementById("imageWithText"), {
+          backgroundColor: null,
+          useCORS: true,
+          scale: 1,
+        })
+          .then(async (canvas) => {
+            canvas.toBlob(async (blob) => {
+              if (blob) {
+                // Convert the blob to a File object
+                const fileName = "meme.png"; // Specify the filename
+                const mimeType = "image/png"; // Specify the MIME type
+                const file: File = new File([blob], fileName, {
+                  type: mimeType,
+                });
+                const formData = new FormData();
+                formData.append("file", file, file.name); // Append the file
+                formData.append("name", "Based Meme");
+                formData.append(
+                  "description",
+                  "meme generaterated using basedMeme"
+                );
+                setIsLoading(true);
+                setLoadingText("Generating meme.....");
+                await uploadFile(formData);
+              }
+            }, "image/png");
+          })
+          .then(() => {
+            setMintFinal(false);
+          });
+      }
+    }
+  }, [mintFinal]);
 
   const createEditionNFT = async (ipfsHash: string) => {
     setLoadingText("Creating NFT Edition.......");
@@ -333,8 +384,8 @@ export const CreatePost = () => {
 
   return (
     <>
-      <div className="flex  items-center justify-center overflow-auto">
-        <div className="w-1/2 h-1/2">
+      <div className="flex items-center justify-center overflow-auto ${inter.className}">
+        <div className="w-1/2 min-[350px]:w-[40%] h-1/2">
           <div
             className="inline-block flex flex-col justify-center overflow-hidden gap-4 p-4"
             style={{
@@ -358,7 +409,6 @@ export const CreatePost = () => {
                 style={{
                   color: "white", // text-white translates to setting the text color to white
                   fontSize: "40px",
-                  // marginLeft: "16px",
                 }}
               >
                 {fileName}
@@ -435,6 +485,7 @@ export const CreatePost = () => {
                   onClick={() => {
                     setIsEditable((prev) => !prev);
                     setIsResizable((prev) => !prev);
+                    setIsFinal(false);
                   }}
                 >
                   <img
@@ -451,48 +502,62 @@ export const CreatePost = () => {
               <div>
                 <div
                   className="flex items-center justify-center "
-                  ref={memeRef}
                   style={{
                     userSelect: "none",
                     margin: "16px",
                   }}
                 >
-                  <img
-                    ref={imageRef}
-                    src={imageSrc === null ? imageArray[0] : imageSrc}
+                  <div
+                    id="imageWithText"
+                    ref={memeRef}
                     style={{
                       borderRadius: 8,
                       width: "450px",
                       maxHeight: "500px",
                       height: "auto",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      // position: "absolute",
                     }}
-                    draggable="false"
-                  />
-
-                  {texts.map((text) => (
-                    <TextOverlay
-                      key={text.id}
-                      text={text.text}
-                      color={text.color}
-                      fontSize={text.fontSize}
-                      fontName={text.fontName}
-                      onDragStop={null}
-                      onResizeStop={null}
-                      isEditable={isEditable}
-                      isResizable={isResizable}
-                      isFinal={isFinal}
+                  >
+                    <img
+                      ref={imageRef}
+                      src={imageSrc === null ? imageArray[0] : imageSrc}
+                      style={{
+                        borderRadius: 8,
+                        width: "auto",
+                        maxHeight: "500px",
+                        height: "auto",
+                      }}
+                      draggable="false"
                     />
-                  ))}
 
-                  {images.map((image) => (
-                    <ImageOverlay
-                      key={image.id}
-                      src={image.src}
-                      isEditable={isEditable}
-                      isResizable={isResizable}
-                      isFinal={isFinal}
-                    />
-                  ))}
+                    {texts.map((text) => (
+                      <TextOverlay
+                        key={text.id}
+                        text={text.text}
+                        color={text.color}
+                        fontSize={text.fontSize}
+                        fontName={text.fontName}
+                        onDragStop={null}
+                        onResizeStop={null}
+                        isEditable={isEditable}
+                        isResizable={isResizable}
+                        isFinal={isFinal}
+                      />
+                    ))}
+
+                    {images.map((image) => (
+                      <ImageOverlay
+                        key={image.id}
+                        src={image.src}
+                        isEditable={isEditable}
+                        isResizable={isResizable}
+                        isFinal={isFinal}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -524,40 +589,97 @@ export const CreatePost = () => {
 
             <div
               style={{
-                marginTop: "auto",
-                marginBottom: "12px",
-                paddingLeft: 32,
-                paddingRight: 32,
-                paddingTop: 12,
-                paddingBottom: 12,
-                background: "#0252FF",
-                borderRadius: "12px",
-                overflow: "hidden",
-                justifyContent: "center",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
                 alignItems: "center",
-                gap: 10,
-                display: "inline-flex",
-                height: "50px",
-                boxSizing: "border-box",
+                gap: "16px",
+
+                // justifyContent: "space-evenly",
               }}
             >
-              <img src="base-logo.png" alt="baseLogo" />
+              {isConnected && (
+                <>
+                  <div
+                    style={{
+                      flex: "1",
+                      marginTop: "auto",
+                      marginBottom: "12px",
+                      paddingLeft: 32,
+                      paddingRight: 32,
+                      paddingTop: 12,
+                      paddingBottom: 12,
+                      background: "#0252FF",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: 10,
+                      display: "inline-flex",
+                      height: "50px",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <img src="downloadIcon.svg" alt="download" />
 
-              <button
-                onClick={exportMeme}
-                style={{
-                  textAlign: "center",
-                  color: "white",
-                  fontSize: 14,
-                  // fontFamily: "Public Sans",
-                  fontWeight: "600",
-                  wordWrap: "break-word",
-                  height: "50px",
-                }}
-                disabled={fileName.length === 0}
-              >
-                Mint a Meme NFT
-              </button>
+                    <button
+                      onClick={downloadImage}
+                      style={{
+                        textAlign: "center",
+                        color: "white",
+                        fontSize: 14,
+                        // fontFamily: "Public Sans",
+                        fontWeight: "600",
+                        wordWrap: "break-word",
+                        height: "50px",
+                      }}
+                      disabled={fileName.length === 0}
+                    >
+                      Download Meme
+                    </button>
+                  </div>
+                  <div
+                    style={{
+                      flex: "1",
+                      marginTop: "auto",
+                      marginBottom: "12px",
+                      paddingLeft: 32,
+                      paddingRight: 32,
+                      paddingTop: 12,
+                      paddingBottom: 12,
+                      background: "#0252FF",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: 10,
+                      display: "inline-flex",
+                      height: "50px",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <img src="base-logo.png" alt="baseLogo" />
+
+                    <button
+                      onClick={exportMeme}
+                      style={{
+                        textAlign: "center",
+                        color: "white",
+                        fontSize: 14,
+                        // fontFamily: "Public Sans",
+                        fontWeight: "600",
+                        wordWrap: "break-word",
+                        height: "50px",
+                      }}
+                      disabled={fileName.length === 0}
+                    >
+                      Mint Meme
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {!isConnected && <WalletOptions />}
             </div>
           </div>
         </div>
