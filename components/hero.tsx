@@ -53,7 +53,7 @@ export default function Hero({
                 paddingRight: 32,
                 paddingTop: 12,
                 paddingBottom: 12,
-                background: "#5A99F2",
+                background: "#0252FF",
                 borderRadius: 30,
                 overflow: "hidden",
                 justifyContent: "center",
@@ -84,7 +84,7 @@ export default function Hero({
           <img
             className="object-cover object-center rounded"
             alt="hero"
-            src="heroImage.png"
+            src="Pablo.svg"
           />
         </div>
       </div>

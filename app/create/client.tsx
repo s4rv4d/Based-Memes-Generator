@@ -19,6 +19,7 @@ import ImageOverlay from "@/components/ImageOverlay";
 import { saveAs } from "file-saver";
 import { Public_Sans } from "next/font/google";
 import { WalletOptions } from "@/utils/wallet-options";
+import SketchExample from "@/components/SketchExample";
 
 import {
   flattenContractArgs,
@@ -425,7 +426,7 @@ export const CreatePost = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    padding: "4px",
+                    padding: "8px",
                   }}
                   onClick={addText}
                 >
@@ -456,7 +457,7 @@ export const CreatePost = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    padding: "4px",
+                    padding: "8px",
                   }}
                 >
                   <img

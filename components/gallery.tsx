@@ -98,11 +98,7 @@ export default function Gallery() {
               {/* columns-1 gap-5 sm:columns-2 sm:gap-8 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8 */}
               <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-8 md:grid-cols-3 lg:grid-cols-4 gap-4 [&>img:not(:first-child)]:mt-8 ">
                 {nfts.map((nft, index) => (
-                  <div
-                    className="flex flex-col  
-            shadow-md overflow-hidden"
-                    key={index}
-                  >
+                  <div className="flex flex-col overflow-hidden" key={index}>
                     <NFTPost
                       index={index}
                       nft={nft}

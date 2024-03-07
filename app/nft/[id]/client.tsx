@@ -301,10 +301,9 @@ export const Post = ({ id }: { id: string }) => {
                       paddingRight: 32,
                       paddingTop: 12,
                       paddingBottom: 12,
-                      background: "#323232",
+                      background: "#0252FF",
                       borderRadius: 30,
                       overflow: "hidden",
-                      border: "1px #525252 solid",
                       justifyContent: "center",
                       alignItems: "center",
                       gap: 10,
@@ -314,7 +313,7 @@ export const Post = ({ id }: { id: string }) => {
                     <button
                       style={{
                         textAlign: "center",
-                        color: "#5A99F2",
+                        color: "#fff",
                         fontSize: 14,
                         // fontFamily: "Public Sans",
                         fontWeight: "600",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Public_Sans } from "next/font/google";
 import "./globals.css";
 import { headers } from "next/headers";
+import { Toaster } from "react-hot-toast";
 
 import { cookieToInitialState } from "wagmi";
 import { config } from "@/config";
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ContextProvider initialState={initialState}>
           {children}
+          <Toaster />
         </ContextProvider>
       </body>
     </html>

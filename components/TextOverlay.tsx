@@ -3,6 +3,7 @@ import { Rnd, DraggableEventHandler, ResizeHandler } from "react-rnd";
 import "./styles/textoverlay.css";
 // import * as NumericInput from "react-numeric-input";
 import NumericInput from "react-numeric-input";
+import SketchExample from "./SketchExample";
 
 // Extending the interface to include style properties
 interface TextOverlayProps {
@@ -91,6 +92,13 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
     setEditing(false);
   };
 
+  const handleColorChange = (color: any) => {
+    setStyle({
+      ...style,
+      color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
+    });
+  };
+
   return (
     <>
       <Rnd
@@ -129,57 +137,19 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
         disableDragging={isEditable}
         enableResizing={!isEditable}
       >
-        <div className="flex flex-row items-center justify-center">
+        <div className="flex flex-col items-center justify-center gap-2">
           {isEditable && !isFinal && (
             <div className="inline-block flex flex-col bg-blue-500 bg-opacity-0">
               <div
-                className="flex flex-col gap-2 items-center justify-center"
+                className="flex flex-row gap-2 items-center justify-center"
                 style={{
                   backgroundColor: "rgba(255, 255, 255, 0.5)", // Background color with transparency
-                  backdropFilter: "blur(10px)", // Apply blur effect
-                  padding: "8px",
+                  // backdropFilter: "blur(5px)", // Apply blur effect
+                  padding: "4px",
                   borderRadius: "4px",
                 }}
               >
-                {/* <div style={labelStackStyle}> */}
-                <div style={{ position: "relative" }}>
-                  <input
-                    type="color"
-                    value={style.color}
-                    style={{
-                      appearance: "none",
-                      width: "60px",
-                      // height: "15px",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      // Ensure input is above label
-                      position: "relative", // Make sure input is positioned relatively
-                    }}
-                    onChange={(e) =>
-                      setStyle({ ...style, color: e.target.value })
-                    }
-                    id="color"
-                  />
-                  <label
-                    htmlFor="color"
-                    style={{
-                      width: "60px",
-                      // height: "15px",
-                      background: `${style.color}`,
-                      // border: "2px solid black",
-                      borderRadius: "8px",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      position: "absolute", // Position label absolutely
-                      top: 1.5, // Align label with top of input
-                      left: -1, // Align label with left of input
-                      zIndex: 1,
-                    }}
-                  ></label>
-                </div>
-                {/* </div> */}
-                {/* <div style={labelStackStyle}> */}
+                <SketchExample onColorChange={handleColorChange} />
 
                 <NumericInput
                   value={style.fontSize}
@@ -208,28 +178,25 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
           )}
 
           {isFinal && (
-            <input
-              type="text"
-              value={value}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              disabled={true}
+            <span
               style={{
                 background: "transparent",
                 fontFamily: style.fontName,
                 fontSize: `${style.fontSize}px`,
                 color: style.color,
                 textAlign: "center",
-                width: "80px",
-                height: "auto",
-                overflow: "hidden",
+                width: `${state.width}`,
+                height: `${state.height}px`,
+                // overflow: "hidden",
+                wordWrap: "normal",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 cursor: "pointer",
-                wordWrap: "break-word",
               }}
-            />
+            >
+              {value}
+            </span>
           )}
 
           {!isFinal &&
@@ -254,6 +221,7 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
                   alignItems: "center",
                   cursor: "pointer",
                   wordWrap: "break-word",
+                  border: "1px solid white",
                 }}
               />
             ) : (
@@ -266,9 +234,9 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
                   color: style.color,
                   textAlign: "center",
                   width: `${state.width}`,
-                  height: `${state.height}`,
+                  height: `auto`,
                   overflow: "hidden",
-                  wordWrap: "break-word",
+                  wordWrap: "normal",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",

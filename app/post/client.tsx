@@ -8,6 +8,7 @@ import { ZoraAbi, getContractFromChainId } from "../../abi/zoraEdition";
 import Loader from "@/components/loader";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import toast from "react-hot-toast";
 
 interface Nft {
   id: string;
@@ -133,12 +134,23 @@ export const PostInfo = ({ item }: { item: Nft }) => {
       await navigator.clipboard.writeText(
         `${process.env.NEXT_PUBLIC_HOST_URL}/nft/${nft.id}`
       );
+      toast.success("Copied link to clipboard!", {
+        icon: "🔵",
+        style: {
+          background: "#0252FF",
+          color: "#fff",
+        },
+        iconTheme: {
+          primary: "#fff",
+          secondary: "#fff",
+        },
+      });
     } catch (err: any) {
       console.log(err.message);
     }
   };
 
-  const ShareIcon = ({ size = 24, color = "#5A99F2" }) => (
+  const ShareIcon = ({ size = 24, color = "#0252FF" }) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={size}
@@ -151,6 +163,7 @@ export const PostInfo = ({ item }: { item: Nft }) => {
       strokeLinejoin="round"
       className="feather feather-share"
       onClick={() => copyToClipboard()}
+      cursor="pointer"
     >
       <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
       <polyline points="16 6 12 2 8 6"></polyline>
@@ -319,10 +332,9 @@ export const PostInfo = ({ item }: { item: Nft }) => {
                     paddingRight: 32,
                     paddingTop: 12,
                     paddingBottom: 12,
-                    background: "#323232",
+                    background: "#0252FF",
                     borderRadius: 30,
                     overflow: "hidden",
-                    border: "1px #525252 solid",
                     justifyContent: "center",
                     alignItems: "center",
                     gap: 10,
@@ -332,7 +344,7 @@ export const PostInfo = ({ item }: { item: Nft }) => {
                   <button
                     style={{
                       textAlign: "center",
-                      color: "#5A99F2",
+                      color: "#fff",
                       fontSize: 14,
                       // fontFamily: "Public Sans",
                       fontWeight: "600",
