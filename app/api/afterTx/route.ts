@@ -31,7 +31,7 @@ async function getResponse(req: NextRequest): Promise<NextResponse> {
 
   const body: FrameRequest = await req.json();
   const { isValid, message } = await getFrameMessage(body, {
-    neynarApiKey: "30567A62-46D0-4DCC-8153-3C3E5F77C3D5",
+    neynarApiKey: process.env.NEXT_PUBLIC_NEYNAR_API_KEY,
   });
 
   if (!isValid) {
