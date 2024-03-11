@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { getFrameMetadata } from "@coinbase/onchainkit";
 import { cookieToInitialState } from "wagmi";
 import { config } from "@/config";
 import ContextProvider from "@/context";
@@ -26,6 +27,25 @@ export async function generateMetadata({
   const nft: Nft = await fetchDoc(params.id);
   const name = nft.fileName;
 
+  const frameMetadata = getFrameMetadata({
+    buttons: [
+      {
+        action: "tx",
+        label: "Mint",
+        target: `${String(
+          process.env.NEXT_PUBLIC_HOST_URL
+        )}/api/mint?editionAddress=${nft.editionAddress}&id=${params.id}`,
+      },
+    ],
+    image: {
+      src: `${parseIpfsUrl(nft.ipfs).gateway}`,
+      aspectRatio: "1:1",
+    },
+    postUrl: `${String(process.env.NEXT_PUBLIC_HOST_URL)}/api/aftertx?id=${
+      params.id
+    }`,
+  });
+
   return {
     title: name,
     description: `${name} on basedMemes.xyz`,
@@ -42,6 +62,9 @@ export async function generateMetadata({
       ],
       locale: "en_US",
       type: "website",
+    },
+    other: {
+      ...frameMetadata,
     },
   };
 }

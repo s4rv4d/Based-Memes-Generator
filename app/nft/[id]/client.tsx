@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
 import { useAccount, useEnsName } from "wagmi";
 import { parseIpfsUrl } from "@/hooks/useZoraCreateEdition";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { ZoraAbi, getContractFromChainId } from "../../../abi/zoraEdition";
+import {
+  ZoraAbi,
+  getContractFromChainId,
+  computeEthToSpend,
+} from "../../../abi/zoraEdition";
 import { Account } from "@/utils/account";
 import { WalletOptions } from "@/utils/wallet-options";
 import Loader from "@/components/loader";
@@ -38,65 +42,6 @@ export const Post = ({ id }: { id: string }) => {
   function ConnectWallet() {
     return <WalletOptions />;
   }
-
-  const computeEthToSpend = (publicSalePrice: string, numEditions: string) => {
-    if (numEditions === "")
-      return {
-        creatorReward: BigInt(0),
-        createReward: BigInt(0),
-        mintReferral: BigInt(0),
-        zoraFee: BigInt(0),
-        firstMinterReward: BigInt(0),
-        total: BigInt(0),
-      };
-
-    const bigNumEditions = BigInt(numEditions);
-
-    // defaults
-    const creatorReward = BigInt("333000000000000") * bigNumEditions;
-    const createReward = BigInt("111000000000000") * bigNumEditions;
-    const mintReferral = BigInt("111000000000000") * bigNumEditions;
-    const zoraFee = BigInt("111000000000000") * bigNumEditions;
-    const firstMinterReward = BigInt("111000000000000") * bigNumEditions;
-
-    if (publicSalePrice === "0") {
-      // free mint
-
-      return {
-        creatorReward,
-        createReward,
-        mintReferral,
-        zoraFee,
-        firstMinterReward,
-        total:
-          creatorReward +
-          createReward +
-          mintReferral +
-          zoraFee +
-          firstMinterReward,
-      };
-    } else {
-      // paid mint
-      const editionPrice = BigInt(publicSalePrice) * bigNumEditions;
-      const p_createReward = createReward * BigInt(2);
-      const p_mintReferral = mintReferral * BigInt(2);
-      const p_zoraFee = zoraFee * BigInt(2);
-      const p_firstMinterReward = firstMinterReward;
-      return {
-        editionPrice,
-        createReward: p_createReward,
-        mintReferral: p_mintReferral,
-        zoraFee: p_zoraFee,
-        firstMinterReward,
-        total:
-          editionPrice +
-          p_createReward +
-          p_mintReferral +
-          p_zoraFee +
-          p_firstMinterReward,
-      };
-    }
-  };
 
   const mintEditionNFT = async () => {
     setIsLoading(true);

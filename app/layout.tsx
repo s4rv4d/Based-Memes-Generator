@@ -24,6 +24,9 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <link rel="shortcut icon" href="/basedMemesFVIcon.svg" />
+      </head>
       <body className={inter.className}>
         <ContextProvider initialState={initialState}>
           {children}
