@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Rnd, DraggableEventHandler, ResizeHandler } from "react-rnd";
 import "./styles/textoverlay.css";
 // import * as NumericInput from "react-numeric-input";
@@ -66,8 +66,8 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
   const [state, setState] = useState<SizeState>({
     x: 0,
     y: 0,
-    width: 100,
-    height: 100,
+    width: "100px",
+    height: "100px",
   });
 
   const [style, setStyle] = useState<StyleType>({
@@ -99,16 +99,19 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
     });
   };
 
+  useEffect(() => {
+    console.log(`test ${state.width}, ${state.height}`);
+  }, []);
+
   return (
     <>
       <Rnd
-        // default={{
-        //   x: 0,
-        //   y: 0,
-        //   width: 300,
-        //   height: 150,
-        // }}
-        onClick={handleDoubleClick}
+        default={{
+          x: 0,
+          y: 0,
+          width: "100px",
+          height: "100px",
+        }}
         style={{
           // overflow: "clip",
           display: "flex",
@@ -122,6 +125,7 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
           height: `${state.height}px`,
         }}
         onResizeStop={(e, direction, ref, delta, position) => {
+          console.log(`testing: ${ref.style.width}  ${ref.style.height}`);
           setState({
             width: ref.style.width,
             height: ref.style.height,
@@ -137,7 +141,7 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
         disableDragging={isEditable}
         enableResizing={!isEditable}
       >
-        <div className="flex flex-col items-center justify-center gap-2">
+        <div className="flex flex-col items-center justify-center">
           {isEditable && !isFinal && (
             <div className="inline-block flex flex-col bg-blue-500 bg-opacity-0">
               <div
@@ -186,7 +190,7 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
                 color: style.color,
                 textAlign: "center",
                 width: `${state.width}`,
-                height: `${state.height}px`,
+                height: `${state.height}`,
                 // overflow: "hidden",
                 wordWrap: "normal",
                 display: "flex",
@@ -200,9 +204,9 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
           )}
 
           {!isFinal &&
-            (isEditable ? (
-              <input
-                type="text"
+            (editing ? (
+              <textarea
+                // type="text"
                 value={value}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -213,28 +217,24 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
                   fontSize: `${style.fontSize}px`,
                   color: style.color,
                   textAlign: "center",
-                  width: "80px",
-                  height: "auto",
-                  overflow: "hidden",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  width: `${state.width}`,
+                  height: `${state.height}`,
+                  // overflow: "hidden",
                   cursor: "pointer",
-                  wordWrap: "break-word",
-                  border: "1px solid white",
+                  // wordWrap: "break-word",
+                  resize: "none",
                 }}
               />
             ) : (
-              <button
-                // onTouchStart={handleDoubleClick}
-                onClick={handleDoubleClick}
+              <label
+                onDoubleClick={handleDoubleClick}
                 style={{
                   fontFamily: style.fontName,
                   fontSize: `${style.fontSize}px`,
                   color: style.color,
                   textAlign: "center",
                   width: `${state.width}`,
-                  height: `auto`,
+                  height: `${state.height}`,
                   overflow: "hidden",
                   wordWrap: "normal",
                   display: "flex",
@@ -243,19 +243,8 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
                   cursor: "pointer",
                 }}
               >
-                {value.length == 0 ? (
-                  <div className="flex flex-row items-center justify-center gap-[4px]">
-                    <img
-                      src="settings.svg"
-                      alt="text"
-                      // style={{ height: "38px", width: "38px" }}
-                    />
-                    {" to edit"}
-                  </div>
-                ) : (
-                  value
-                )}
-              </button>
+                {value.length == 0 ? "Double tap to edit" : value}
+              </label>
             ))}
         </div>
       </Rnd>

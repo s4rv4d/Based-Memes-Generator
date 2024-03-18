@@ -95,8 +95,8 @@ export default function Gallery() {
                 padding: "2rem", // Converts 'p-4' assuming 1rem = 16px, and '4' in Tailwind corresponds to 1rem
               }}
             >
-              {/* columns-1 gap-5 sm:columns-2 sm:gap-8 md:columns-3 lg:columns-4 [&>img:not(:first-child)]:mt-8 */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-8 md:grid-cols-3 lg:grid-cols-4 gap-4 [&>img:not(:first-child)]:mt-8 ">
+              {/* grid grid-cols-1 sm:grid-cols-2 sm:gap-8 md:grid-cols-3 lg:grid-cols-4 gap-4 [&>img:not(:first-child)]:mt-8 */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-8 md:grid-cols-3 lg:grid-cols-4 gap-4 [&>img:not(:first-child)]:mt-0 ">
                 {nfts.map((nft, index) => (
                   <div className="flex flex-col overflow-hidden" key={index}>
                     <NFTPost

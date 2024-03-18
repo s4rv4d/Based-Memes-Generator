@@ -526,7 +526,7 @@ export const CreatePost = () => {
                       ref={imageRef}
                       src={imageSrc === null ? imageArray[0] : imageSrc}
                       style={{
-                        borderRadius: 8,
+                        // borderRadius: 8,
                         width: "auto",
                         maxHeight: "500px",
                         height: "auto",
