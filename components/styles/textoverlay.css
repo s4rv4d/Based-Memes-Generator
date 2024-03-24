@@ -31,7 +31,7 @@
 .resize-handle-top-right {
   width: 10px;
   height: 10px;
-  background-color: #d25e5e;
+  background-color: #fff;
   top: -5px;
   right: -5px;
   cursor: ne-resize;

@@ -29,9 +29,9 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
           alt={`Carousel image ${index}`}
           className="flex-shrink-0 object-cover overflow-x-hidden"
           style={{
-            height: "5rem",
+            height: "40px",
             border: index === selectedIndex ? "2px solid white" : "none",
-            borderRadius: 8,
+            borderRadius: 4,
             margin: 8,
             marginBottom: 12,
           }}

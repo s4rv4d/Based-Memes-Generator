@@ -6,22 +6,22 @@ import NumericInput from "react-numeric-input";
 import SketchExample from "./SketchExample";
 
 // Extending the interface to include style properties
-interface TextOverlayProps {
-  text: string;
-  onDragStop: DraggableEventHandler | null;
-  onResizeStop: ResizeHandler | null;
-  fontName: string;
-  fontSize: string;
-  color: string;
-  isEditable: boolean;
-  isResizable: boolean;
-  isFinal: boolean;
-}
-
 interface StyleType {
   fontName: string;
   fontSize: number;
   color: string;
+  strokeColor: string;
+}
+
+interface TextOverlayProps {
+  text: string;
+  itemKey: number;
+  onDragStop: DraggableEventHandler | null;
+  onResizeStop: ResizeHandler | null;
+  isEditable: boolean;
+  isFinal: boolean;
+  onEdit: (key: number | undefined) => void;
+  style: StyleType;
 }
 
 interface SizeState {
@@ -31,37 +31,12 @@ interface SizeState {
   height: number | string;
 }
 
-const inputStyle: React.CSSProperties = {
-  // paddingLeft: "8px",
-  color: "#FFFFFF",
-  height: "40px",
-  background: "#525252",
-  borderRadius: "4px",
-};
-
-const editInputStyle: React.CSSProperties = {
-  padding: "8px",
-  color: "#FFFFFF",
-  height: "30px",
-  width: "30px",
-  background: "transparent",
-};
-
-const labelStackStyle: React.CSSProperties = {
-  flexDirection: "column",
-  background: "transparent",
-  display: "flex",
-  margin: 0,
-  gap: 4,
-};
-
 const TextOverlay: React.FC<TextOverlayProps> = ({
-  fontName,
-  fontSize,
-  color,
+  itemKey,
   isEditable,
-  isResizable,
   isFinal,
+  style,
+  onEdit,
 }) => {
   const [state, setState] = useState<SizeState>({
     x: 0,
@@ -70,18 +45,10 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
     height: "100px",
   });
 
-  const [style, setStyle] = useState<StyleType>({
-    fontName: "Impact",
-    fontSize: 15,
-    color: "#FFFFFF",
-  });
-
   const [value, setValue] = useState("");
-  const [editing, setEditing] = useState(false);
 
   const handleDoubleClick = () => {
-    console.log("clicked");
-    setEditing(true);
+    onEdit(itemKey);
   };
 
   const handleChange = (e) => {
@@ -89,19 +56,8 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
   };
 
   const handleBlur = () => {
-    setEditing(false);
+    onEdit(undefined);
   };
-
-  const handleColorChange = (color: any) => {
-    setStyle({
-      ...style,
-      color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
-    });
-  };
-
-  useEffect(() => {
-    console.log(`test ${state.width}, ${state.height}`);
-  }, []);
 
   return (
     <>
@@ -121,11 +77,10 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
           userSelect: "auto",
         }}
         size={{
-          width: `${state.width}px`,
-          height: `${state.height}px`,
+          width: `${state.width}`,
+          height: `${state.height}`,
         }}
         onResizeStop={(e, direction, ref, delta, position) => {
-          console.log(`testing: ${ref.style.width}  ${ref.style.height}`);
           setState({
             width: ref.style.width,
             height: ref.style.height,
@@ -139,48 +94,9 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
           topRight: "resize-handle-top-right",
         }}
         disableDragging={isEditable}
-        enableResizing={!isEditable}
+        enableResizing={!isFinal}
       >
-        <div className="flex flex-col items-center justify-center">
-          {isEditable && !isFinal && (
-            <div className="inline-block flex flex-col bg-blue-500 bg-opacity-0">
-              <div
-                className="flex flex-row gap-2 items-center justify-center"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.5)", // Background color with transparency
-                  // backdropFilter: "blur(5px)", // Apply blur effect
-                  padding: "4px",
-                  borderRadius: "4px",
-                }}
-              >
-                <SketchExample onColorChange={handleColorChange} />
-
-                <NumericInput
-                  value={style.fontSize}
-                  style={{
-                    wrap: { background: "transparent", width: "60px" },
-                    input: {
-                      color: "black",
-                      width: "60px",
-                      padding: "2px",
-                    },
-                  }}
-                  // style={{
-                  //   ...editInputStyle,
-                  //   // width: "60px",
-                  // }}
-                  onChange={(e) => {
-                    setStyle({
-                      ...style,
-                      fontSize: e,
-                    }); // Ensure unit is included for fontSize
-                  }}
-                />
-                {/* </div> */}
-              </div>
-            </div>
-          )}
-
+        <div>
           {isFinal && (
             <span
               style={{
@@ -191,12 +107,12 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
                 textAlign: "center",
                 width: `${state.width}`,
                 height: `${state.height}`,
-                // overflow: "hidden",
                 wordWrap: "normal",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 cursor: "pointer",
+                WebkitTextStroke: `1px ${style.strokeColor}`,
               }}
             >
               {value}
@@ -204,24 +120,22 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
           )}
 
           {!isFinal &&
-            (editing ? (
+            (isEditable ? (
               <textarea
                 // type="text"
                 value={value}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 autoFocus
                 style={{
                   background: "transparent",
                   fontFamily: style.fontName,
                   fontSize: `${style.fontSize}px`,
                   color: style.color,
+                  WebkitTextStroke: `1px ${style.strokeColor}`,
                   textAlign: "center",
                   width: `${state.width}`,
                   height: `${state.height}`,
-                  // overflow: "hidden",
                   cursor: "pointer",
-                  // wordWrap: "break-word",
                   resize: "none",
                 }}
               />
@@ -232,6 +146,9 @@ const TextOverlay: React.FC<TextOverlayProps> = ({
                   fontFamily: style.fontName,
                   fontSize: `${style.fontSize}px`,
                   color: style.color,
+                  WebkitTextStroke: `${value.length == 0 ? "0px" : "1px"} ${
+                    style.strokeColor
+                  }`,
                   textAlign: "center",
                   width: `${state.width}`,
                   height: `${state.height}`,

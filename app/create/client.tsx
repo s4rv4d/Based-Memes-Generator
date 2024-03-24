@@ -19,7 +19,7 @@ import ImageOverlay from "@/components/ImageOverlay";
 import { saveAs } from "file-saver";
 import { Public_Sans } from "next/font/google";
 import { WalletOptions } from "@/utils/wallet-options";
-import SketchExample from "@/components/SketchExample";
+import TextEditor from "./components/TextEditor";
 
 import {
   flattenContractArgs,
@@ -28,6 +28,22 @@ import {
 } from "../../hooks/useZoraCreateEdition";
 
 const inter = Public_Sans({ subsets: ["latin"] });
+
+// interfaces
+interface StyleType {
+  fontName: string;
+  fontSize: number;
+  color: string;
+  strokeColor: string;
+}
+
+interface TextInterface {
+  id: number;
+  text: string;
+  x: number;
+  y: number;
+  style: StyleType;
+}
 
 export const CreatePost = () => {
   const [imageSrc, setImageSrc] = useState<string | null>(null); // To store the uploaded image source
@@ -38,7 +54,7 @@ export const CreatePost = () => {
   const [loadingText, setLoadingText] = useState<string | undefined>(
     "Loading..."
   );
-  const [fileName, setFileName] = useState<string>("Based Meme");
+  const [fileName, setFileName] = useState<string>("");
   const [dbId, setDbId] = useState<string>("");
   const [dbPushDone, setDbPushDone] = useState<boolean>(false);
   const [isEditable, setIsEditable] = useState<boolean>(false);
@@ -46,8 +62,6 @@ export const CreatePost = () => {
   const [isFinal, setIsFinal] = useState<boolean>(false);
   const [dowFinal, setDwFinal] = useState<boolean>(false);
   const [mintFinal, setMintFinal] = useState<boolean>(false);
-
-  // https://warpcast.com/~/compose?text=Hello%20world!
 
   const {
     data: hash,
@@ -61,8 +75,73 @@ export const CreatePost = () => {
     Number(process.env.NEXT_PUBLIC_CHAIN_ID)
   );
 
-  const [texts, setTexts] = useState([]);
+  const [texts, setTexts] = useState<TextInterface[]>([]);
   const [images, setImages] = useState([]);
+  const [activeView, setActiveView] = useState<number | undefined>();
+  const [editTitle, setEditTitle] = useState<boolean>(false);
+
+  const handleTextEdit = (key: number | undefined) => {
+    setActiveView(key);
+  };
+
+  const handleFontSizeChange = (fontSize: number) => {
+    setTexts((currentTexts) =>
+      currentTexts.map((item, index) => {
+        if (item.id === (activeView as number)) {
+          // This is the item we want to update
+          return {
+            ...item, // Copy all existing item properties
+            style: {
+              ...item.style, // Copy all existing style properties
+              fontSize: fontSize, // Update the color property
+            },
+          };
+        }
+        return item; // For all other items, return them unchanged
+      })
+    );
+  };
+
+  const handleStrokeChange = (color: string) => {
+    setTexts((currentTexts) =>
+      currentTexts.map((item, index) => {
+        if (item.id === (activeView as number)) {
+          // This is the item we want to update
+          console.log("found index");
+          return {
+            ...item, // Copy all existing item properties
+            style: {
+              ...item.style, // Copy all existing style properties
+              strokeColor: color, // Update the color property
+            },
+          };
+        }
+        return item; // For all other items, return them unchanged
+      })
+    );
+  };
+
+  const handleColorChange = (color: string) => {
+    setTexts((currentTexts) =>
+      currentTexts.map((item, index) => {
+        if (item.id === (activeView as number)) {
+          // This is the item we want to update
+          return {
+            ...item, // Copy all existing item properties
+            style: {
+              ...item.style, // Copy all existing style properties
+              color: color, // Update the color property
+            },
+          };
+        }
+        return item; // For all other items, return them unchanged
+      })
+    );
+  };
+
+  const handleBlur = () => {
+    setActiveView(undefined);
+  };
 
   // function to create new texts
   const addText = () => {
@@ -71,9 +150,12 @@ export const CreatePost = () => {
       text: "New Text",
       x: 100,
       y: 100,
-      fontName: "Impact",
-      fontSize: "30",
-      color: "#FFFFFF",
+      style: {
+        fontName: "Impact",
+        fontSize: 20,
+        color: "#FFFFFF",
+        strokeColor: "#FFFFFF",
+      },
     };
     setTexts([...texts, newText]);
     setIsFinal(false);
@@ -383,12 +465,21 @@ export const CreatePost = () => {
     "meme-templates/group-therapy.jpg",
   ];
 
+  const getTextStyleById = (id: number) => {
+    const textObject = texts.find((item) => item.id === id);
+    if (textObject) {
+      console.log(textObject.style); // Accessing style property
+      return textObject;
+    }
+    return null; // Or handle the case where the text object isn't found
+  };
+
   return (
     <>
       <div className="flex items-center justify-center overflow-auto ${inter.className}">
         <div className="w-1/2 min-[350px]:w-[40%] h-1/2">
           <div
-            className="inline-block flex flex-col justify-center overflow-hidden gap-4 p-4"
+            className="inline-block flex flex-col justify-center overflow-hidden gap-4"
             style={{
               background: "linear-gradient(108deg, #2E2E2E 0%, #1F1F1F 100%)",
               boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.16)",
@@ -398,40 +489,150 @@ export const CreatePost = () => {
               position: "relative",
             }}
           >
+            {/* image carousel part */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                alignItems: "center",
+                background: "#424242",
+                paddingTop: "20px",
+                paddingLeft: "16px",
+                // gap: "50px",
+              }}
+            >
+              <ImageCarousel
+                images={imageArray}
+                onImageSelect={handleCarouselSelection}
+                selectedIndex={selectedIndex}
+              />
+
+              <div
+                style={{
+                  flex: "1",
+                  // width: "300px",
+                  // height: "50px",
+                  background: "#323232",
+                  border: "1px solid #525252",
+                  borderRadius: 30,
+                  paddingTop: "10px",
+                  paddingBottom: "10px",
+                  paddingLeft: "12px",
+                  paddingRight: "12px",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  display: "inline-flex",
+                  marginLeft: "10px",
+                  marginRight: "20px",
+                  gap: "4px",
+                }}
+              >
+                <img src="addTemp.svg" alt="addTemp" />
+                <button
+                  style={{
+                    width: "120px",
+                    height: "20px",
+                    textAlign: "center",
+                    color: "white",
+                    fontSize: 12,
+                    fontFamily: "Inter",
+                    fontWeight: "600",
+                    wordWrap: "break-word",
+                  }}
+                >
+                  Add Template
+                </button>
+              </div>
+            </div>
+
             <div
               style={{
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
+                marginLeft: "20px",
+                marginRight: "20px",
               }}
             >
-              <h1
+              <div
                 style={{
-                  color: "white", // text-white translates to setting the text color to white
-                  fontSize: "40px",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "4px",
+                  height: "24px",
+                  width: "auto",
                 }}
               >
-                {fileName}
-              </h1>
+                {editTitle && (
+                  <input
+                    type="text"
+                    placeholder="Meme name"
+                    autoFocus
+                    onClick={() => {
+                      setEditTitle((prev) => !prev);
+                    }}
+                    onChange={(e) => {
+                      handleFileNameUpdate(e.target.value);
+                    }}
+                    onBlur={() => {
+                      setEditTitle((prev) => !prev);
+                    }}
+                    value={fileName}
+                    style={{
+                      color: "#FFFFFF",
+                      fontSize: 16,
+                      fontFamily: "Inter",
+                      fontWeight: "600",
+                      background: "transparent",
+                      width: "auto",
+                    }}
+                  />
+                )}
+                {!editTitle && (
+                  <label
+                    style={{
+                      color: `${fileName.length == 0 ? "#5E5E63" : "white"}`,
+                      cursor: "pointer",
+                      fontSize: 16,
+                      fontFamily: "Inter",
+                      fontWeight: "600",
+                    }}
+                    onClick={() => {
+                      setEditTitle((prev) => !prev);
+                    }}
+                  >
+                    {fileName.length === 0 ? "Add Meme Title" : fileName}
+                  </label>
+                )}
+
+                <img
+                  src="addTitle.svg"
+                  alt="title"
+                  // style={{ height: "38px", width: "38px" }}
+                />
+              </div>
 
               <div className="flex flex-row gap-4">
                 <button
                   style={{
-                    width: "40px",
-                    height: "40px",
+                    width: "44px",
+                    height: "44px",
                     background: "transparent",
                     border: "1px #525252 solid",
-                    borderRadius: "4px",
+                    borderRadius: 15,
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    padding: "8px",
+                    padding: "10px",
                   }}
                   onClick={addText}
                 >
                   <img
-                    src="add_text.svg"
+                    src="addNewText.svg"
                     alt="text"
                     // style={{ height: "38px", width: "38px" }}
                   />
@@ -449,15 +650,15 @@ export const CreatePost = () => {
                 <label
                   htmlFor="fileInput"
                   style={{
-                    width: "40px",
-                    height: "40px",
+                    width: "44px",
+                    height: "44px",
                     background: "transparent",
                     border: "1px #525252 solid",
-                    borderRadius: "4px",
+                    borderRadius: 15,
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    padding: "8px",
+                    padding: "10px",
                   }}
                 >
                   <img
@@ -470,39 +671,14 @@ export const CreatePost = () => {
                     }}
                   />
                 </label>
-
-                <button
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    background: "transparent",
-                    border: "1px #525252 solid",
-                    borderRadius: "4px",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: "4px",
-                  }}
-                  onClick={() => {
-                    setIsEditable((prev) => !prev);
-                    setIsResizable((prev) => !prev);
-                    setIsFinal(false);
-                  }}
-                >
-                  <img
-                    src="settings.svg"
-                    alt="text"
-                    // style={{ height: "38px", width: "38px" }}
-                  />
-                </button>
               </div>
             </div>
 
-            <div className="">
+            <div>
               {/* Meme editor content */}
               <div>
                 <div
-                  className="flex items-center justify-center "
+                  className="flex items-center justify-center"
                   style={{
                     userSelect: "none",
                     margin: "16px",
@@ -532,23 +708,28 @@ export const CreatePost = () => {
                         height: "auto",
                       }}
                       draggable="false"
+                      onClick={handleBlur}
                     />
-
+                    {/* bounds parent */}
                     {texts.map((text) => (
                       <TextOverlay
                         key={text.id}
+                        itemKey={text.id}
                         text={text.text}
-                        color={text.color}
-                        fontSize={text.fontSize}
-                        fontName={text.fontName}
                         onDragStop={null}
                         onResizeStop={null}
-                        isEditable={isEditable}
-                        isResizable={isResizable}
+                        isEditable={
+                          activeView
+                            ? activeView === text.id
+                              ? true
+                              : false
+                            : false
+                        }
+                        style={text.style}
                         isFinal={isFinal}
+                        onEdit={handleTextEdit}
                       />
                     ))}
-
                     {images.map((image) => (
                       <ImageOverlay
                         key={image.id}
@@ -563,30 +744,14 @@ export const CreatePost = () => {
               </div>
             </div>
 
-            {/* image carousel part */}
-            <ImageCarousel
-              images={imageArray}
-              onImageSelect={handleCarouselSelection}
-              selectedIndex={selectedIndex}
-            />
-
-            <input
-              type="text"
-              placeholder="Meme name"
-              onChange={(e) => {
-                handleFileNameUpdate(e.target.value);
-              }}
-              value={fileName}
-              style={{
-                color: "#FFFFFF",
-                height: "50px",
-                width: "100%",
-                background: "#424242",
-                border: "1px #525252 solid",
-                borderRadius: "12px",
-                paddingLeft: "16px",
-              }}
-            />
+            {activeView && (
+              <TextEditor
+                style={getTextStyleById(activeView as number)?.style}
+                handleColorChange={handleColorChange}
+                handleFontSizeChange={handleFontSizeChange}
+                handleStrokeChange={handleStrokeChange}
+              />
+            )}
 
             <div
               style={{

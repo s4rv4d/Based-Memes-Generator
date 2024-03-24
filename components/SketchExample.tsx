@@ -7,12 +7,7 @@ import { SketchPicker } from "react-color";
 class SketchExample extends React.Component {
   state = {
     displayColorPicker: false,
-    color: {
-      r: "255",
-      g: "255",
-      b: "255",
-      a: "1",
-    },
+    color: this.props.color,
   };
 
   handleClick = () => {
@@ -24,10 +19,10 @@ class SketchExample extends React.Component {
   };
 
   handleChange = (color) => {
-    this.setState({ color: color.rgb });
+    this.setState({ color: color.hex });
 
     if (this.props.onColorChange) {
-      this.props.onColorChange(color.rgb);
+      this.props.onColorChange(color.hex);
     }
   };
 
@@ -38,7 +33,7 @@ class SketchExample extends React.Component {
           width: "20px",
           height: "20px",
           borderRadius: "50%",
-          background: `rgba(${this.state.color.r}, ${this.state.color.g}, ${this.state.color.b}, ${this.state.color.a})`,
+          background: `${this.state.color}`,
         },
         swatch: {
           display: "flex",
