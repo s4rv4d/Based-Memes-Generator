@@ -4,9 +4,7 @@ import fs from "fs";
 // const pinataSDK = require("@pinata/sdk");
 import * as pinataSDK from "@pinata/sdk";
 
-const jwtToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI2ODEyNzY2NS1jZjNjLTRkNzAtOTZiNS1kYTdjNjFlNzM1YjgiLCJlbWFpbCI6InNhcnZhZHNoZXR0eUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJpZCI6IkZSQTEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX0seyJpZCI6Ik5ZQzEiLCJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MX1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiOTk4OWYwZWIyMmUxNzA4MzkyZTEiLCJzY29wZWRLZXlTZWNyZXQiOiIyMTI3MTYzMjkwMjk4NzY3Mjc2YjE1MGQ0ZWU2NzNmNTA3MjFlZWUyMjE4NjNiYTQ4MTI2OTdiZWE3NjM4YTMxIiwiaWF0IjoxNzA3MjQ3ODExfQ.glvWqmFoqFRnlsRo6y8EzfX4s5Fqv7CeOBF8tzPZUfE";
-
+const jwtToken = process.env.NEXT_PUBLIC_PINATA_JWT;
 // @ts-ignore
 const pinata = new pinataSDK({ pinataJWTKey: jwtToken });
 
@@ -96,7 +94,7 @@ export default async function handler(
     try {
       // @ts-ignore
       const response = await pinata.pinList(
-        { pinataJWTKey: process.env.PINATA_JWT },
+        { pinataJWTKey: process.env.NEXT_PUBLIC_PINATA_JWT },
         {
           pageLimit: 1,
         }

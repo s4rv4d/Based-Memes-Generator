@@ -25,19 +25,10 @@ interface Nft {
 }
 
 async function getResponse(req: NextRequest): Promise<NextResponse | Response> {
-  //   console.log(req.query.editionAddress);
-  //   console.log(req.query.id);
-
   const editionAddress = req.nextUrl.searchParams.get(
     "editionAddress"
   ) as string;
   const id = req.nextUrl.searchParams.get("id") as string;
-
-  //   const editionAddress = req.query.editionAddress as string;
-  //   const id = req.query.id as string;
-
-  console.log(editionAddress);
-  console.log(id);
 
   const nft: Nft = await fetchDoc(id);
 
