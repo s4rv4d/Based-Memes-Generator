@@ -31,17 +31,17 @@ const NFTPost = ({
       style={{
         width: "auto",
         maxWidth: "350px",
-        height: "auto",
-        padding: 20,
+        height: "350px",
+        padding: 16,
         background: "linear-gradient(108deg, #2E2E2E 0%, #1F1F1F 100%)",
         boxShadow: "0px 3px 3px rgba(0, 0, 0, 0.16)",
         borderRadius: 25,
         overflow: "hidden",
         border: "1px #525252 solid",
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
+        justifyContent: "center",
+        alignItems: "center",
         gap: 10,
-        display: "inline-flex",
+        display: "flex",
         flexDirection: "column",
         margin: "16px",
       }}
@@ -53,6 +53,7 @@ const NFTPost = ({
       <div
         style={{
           gap: 4,
+          width: "100%",
         }}
       >
         <div
@@ -96,6 +97,7 @@ const NFTPost = ({
           </span>
         </div>
       </div>
+
       <div
         style={{
           background: "white",
@@ -103,7 +105,13 @@ const NFTPost = ({
           overflow: "hidden",
           justifyContent: "center",
           alignItems: "center",
-          display: "inline-flex",
+          display: "flex",
+          width: "auto",
+          // maxWidth: "350px",
+          flex: "1",
+          height: "350px",
+          // marginLeft: "20px",
+          // marginRight: "20px",
         }}
       >
         <img

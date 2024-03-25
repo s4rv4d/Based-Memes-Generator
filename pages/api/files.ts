@@ -8,8 +8,6 @@ const jwtToken = process.env.NEXT_PUBLIC_PINATA_JWT;
 // @ts-ignore
 const pinata = new pinataSDK({ pinataJWTKey: jwtToken });
 
-console.log(pinata);
-
 export const config = {
   api: {
     bodyParser: false,
@@ -22,9 +20,6 @@ interface Fields {
 }
 
 const saveFile = async (file: File, fields: Fields) => {
-  console.log("here 2");
-  console.log(file);
-
   try {
     const stream = fs.createReadStream(file[0].filepath);
     const options = {

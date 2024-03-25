@@ -14,13 +14,13 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 }) => {
   return (
     <div
-      // className="lg:w-100 w-1/2"
-      style={{
-        display: "flex",
-        overflowX: "auto",
-        // width: "auto",
-        // margin: "auto",
-      }}
+      className="flex overflow-x-auto max-w-[220px] lg:max-w-[800px]  w-auto"
+      // style={{
+      //   display: "flex",
+      //   overflowX: "auto",
+      //   maxWidth: "220px",
+      //   width: "auto",
+      // }}
     >
       {images.map((image, index) => (
         <img

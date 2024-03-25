@@ -20,6 +20,8 @@ import { saveAs } from "file-saver";
 import { Public_Sans } from "next/font/google";
 import { WalletOptions } from "@/utils/wallet-options";
 import TextEditor from "./components/TextEditor";
+import StickerModal from "./components/StickerModal";
+import { useDisclosure } from "@nextui-org/react";
 
 import {
   flattenContractArgs,
@@ -79,6 +81,8 @@ export const CreatePost = () => {
   const [images, setImages] = useState([]);
   const [activeView, setActiveView] = useState<number | undefined>();
   const [editTitle, setEditTitle] = useState<boolean>(false);
+  const [openSticker, setOpenSticker] = useState<boolean>(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const handleTextEdit = (key: number | undefined) => {
     setActiveView(key);
@@ -180,6 +184,15 @@ export const CreatePost = () => {
       setIsFinal(false);
       setIsEditable(false);
       setImages([...images, newImage]);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddTemplate = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageSrc(reader.result);
     };
     reader.readAsDataURL(file);
   };
@@ -468,7 +481,6 @@ export const CreatePost = () => {
   const getTextStyleById = (id: number) => {
     const textObject = texts.find((item) => item.id === id);
     if (textObject) {
-      console.log(textObject.style); // Accessing style property
       return textObject;
     }
     return null; // Or handle the case where the text object isn't found
@@ -477,7 +489,7 @@ export const CreatePost = () => {
   return (
     <>
       <div className="flex items-center justify-center overflow-auto ${inter.className}">
-        <div className="w-1/2 min-[350px]:w-[40%] h-1/2">
+        <div className="m-20">
           <div
             className="inline-block flex flex-col justify-center overflow-hidden gap-4"
             style={{
@@ -494,12 +506,12 @@ export const CreatePost = () => {
               style={{
                 display: "flex",
                 flexDirection: "row",
-                justifyContent: "flex-start",
+                justifyContent: "space-between",
                 alignItems: "center",
                 background: "#424242",
                 paddingTop: "20px",
                 paddingLeft: "16px",
-                // gap: "50px",
+                gap: "20px",
               }}
             >
               <ImageCarousel
@@ -508,11 +520,18 @@ export const CreatePost = () => {
                 selectedIndex={selectedIndex}
               />
 
-              <div
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAddTemplate}
+                style={{ display: "none" }}
+                id="tempInput"
+              />
+
+              <label
+                htmlFor="tempInput"
                 style={{
                   flex: "1",
-                  // width: "300px",
-                  // height: "50px",
                   background: "#323232",
                   border: "1px solid #525252",
                   borderRadius: 30,
@@ -523,13 +542,15 @@ export const CreatePost = () => {
                   justifyContent: "center",
                   alignItems: "center",
                   display: "inline-flex",
-                  marginLeft: "10px",
                   marginRight: "20px",
                   gap: "4px",
+                  cursor: "pointer",
+                  maxWidth: "174px",
                 }}
               >
                 <img src="addTemp.svg" alt="addTemp" />
-                <button
+                <label
+                  htmlFor="tempInput"
                   style={{
                     width: "120px",
                     height: "20px",
@@ -539,13 +560,15 @@ export const CreatePost = () => {
                     fontFamily: "Inter",
                     fontWeight: "600",
                     wordWrap: "break-word",
+                    cursor: "pointer",
                   }}
                 >
                   Add Template
-                </button>
-              </div>
+                </label>
+              </label>
             </div>
 
+            {/* title part */}
             <div
               style={{
                 display: "flex",
@@ -609,11 +632,7 @@ export const CreatePost = () => {
                   </label>
                 )}
 
-                <img
-                  src="addTitle.svg"
-                  alt="title"
-                  // style={{ height: "38px", width: "38px" }}
-                />
+                <img src="addTitle.svg" alt="title" />
               </div>
 
               <div className="flex flex-row gap-4">
@@ -631,11 +650,7 @@ export const CreatePost = () => {
                   }}
                   onClick={addText}
                 >
-                  <img
-                    src="addNewText.svg"
-                    alt="text"
-                    // style={{ height: "38px", width: "38px" }}
-                  />
+                  <img src="addNewText.svg" alt="text" />
                 </button>
 
                 <input
@@ -671,6 +686,21 @@ export const CreatePost = () => {
                     }}
                   />
                 </label>
+
+                <div className="flex flex-col gap-2">
+                  <StickerModal
+                    onStickerSelection={(sticker: string) => {
+                      const newImage = {
+                        id: images.length + 1,
+                        src: sticker,
+                      };
+
+                      setIsFinal(false);
+                      setIsEditable(false);
+                      setImages([...images, newImage]);
+                    }}
+                  />
+                </div>
               </div>
             </div>
 
@@ -681,7 +711,7 @@ export const CreatePost = () => {
                   className="flex items-center justify-center"
                   style={{
                     userSelect: "none",
-                    margin: "16px",
+                    // margin: "16px",
                   }}
                 >
                   <div
@@ -689,8 +719,8 @@ export const CreatePost = () => {
                     ref={memeRef}
                     style={{
                       borderRadius: 8,
-                      width: "450px",
-                      maxHeight: "500px",
+                      // maxWidth: "420px",
+                      width: "auto",
                       height: "auto",
                       display: "flex",
                       alignItems: "center",
@@ -701,12 +731,11 @@ export const CreatePost = () => {
                     <img
                       ref={imageRef}
                       src={imageSrc === null ? imageArray[0] : imageSrc}
-                      style={{
-                        // borderRadius: 8,
-                        width: "auto",
-                        maxHeight: "500px",
-                        height: "auto",
-                      }}
+                      // style={{
+                      //   maxWidth: "412px",
+                      //   width: "auto",
+                      // }}
+                      className="max-w-[412px] w-auto h-auto lg:max-h-[550px] lg:max-w-[100%]"
                       draggable="false"
                       onClick={handleBlur}
                     />
@@ -760,55 +789,46 @@ export const CreatePost = () => {
                 justifyContent: "space-between",
                 alignItems: "center",
                 gap: "16px",
-
-                // justifyContent: "space-evenly",
               }}
             >
               {isConnected && (
                 <>
                   <div
                     style={{
-                      flex: "1",
                       marginTop: "auto",
                       marginBottom: "12px",
-                      paddingLeft: 32,
-                      paddingRight: 32,
-                      paddingTop: 12,
-                      paddingBottom: 12,
-                      background: "#0252FF",
-                      borderRadius: "12px",
+                      marginLeft: "20px",
+                      background: "transparent",
+                      borderRadius: 15,
                       overflow: "hidden",
                       justifyContent: "center",
                       alignItems: "center",
-                      gap: 10,
+                      border: "1px #525252 solid",
                       display: "inline-flex",
+                      width: "50px",
                       height: "50px",
                       boxSizing: "border-box",
+                      cursor: "pointer",
                     }}
+                    onClick={downloadImage}
                   >
-                    <img src="downloadIcon.svg" alt="download" />
-
-                    <button
-                      onClick={downloadImage}
+                    <img
+                      src="downloadIcon.svg"
+                      alt="download"
                       style={{
-                        textAlign: "center",
-                        color: "white",
-                        fontSize: 14,
-                        // fontFamily: "Public Sans",
-                        fontWeight: "600",
-                        wordWrap: "break-word",
-                        height: "50px",
+                        paddingLeft: 12,
+                        paddingRight: 12,
+                        paddingTop: 12,
+                        paddingBottom: 12,
                       }}
-                      disabled={fileName.length === 0}
-                    >
-                      Download Meme
-                    </button>
+                    />
                   </div>
                   <div
                     style={{
                       flex: "1",
                       marginTop: "auto",
                       marginBottom: "12px",
+                      marginRight: "20px",
                       paddingLeft: 32,
                       paddingRight: 32,
                       paddingTop: 12,
@@ -832,7 +852,6 @@ export const CreatePost = () => {
                         textAlign: "center",
                         color: "white",
                         fontSize: 14,
-                        // fontFamily: "Public Sans",
                         fontWeight: "600",
                         wordWrap: "break-word",
                         height: "50px",

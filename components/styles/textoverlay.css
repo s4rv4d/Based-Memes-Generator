@@ -1,16 +1,35 @@
 .resize-handle-bottom-right {
-  width: 10px;
-  height: 10px;
+  width: 5px;
+  height: 5px;
   background-color: #fff;
   bottom: -5px;
   right: -5px;
   cursor: se-resize;
-  /* border-radius: 12px; */
+}
+
+.resize-handle-bottom {
+  border-bottom: 4px dashed white;
+  height: 1px;
+}
+
+.resize-handle-top {
+  border-top: 4px dashed white;
+  height: 1px;
+}
+
+.resize-handle-left {
+  border-left: 4px dashed white;
+  height: 1px;
+}
+
+.resize-handle-right {
+  border-right: 4px dashed white;
+  height: 1px;
 }
 
 .resize-handle-bottom-left {
-  width: 10px;
-  height: 10px;
+  width: 5px;
+  height: 5px;
   background-color: #fff;
   bottom: -5px;
   left: -5px;
@@ -19,8 +38,8 @@
 }
 
 .resize-handle-top-left {
-  width: 10px;
-  height: 10px;
+  width: 5px;
+  height: 5px;
   background-color: #fff;
   top: -5px;
   left: -5px;
@@ -29,8 +48,8 @@
 }
 
 .resize-handle-top-right {
-  width: 10px;
-  height: 10px;
+  width: 5px;
+  height: 5px;
   background-color: #fff;
   top: -5px;
   right: -5px;

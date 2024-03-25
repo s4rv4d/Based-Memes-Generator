@@ -24,21 +24,20 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({
   const [state, setState] = useState<SizeState>({
     x: 0,
     y: 0,
-    width: 100,
-    height: 100,
+    width: "100px",
+    height: "100px",
   });
-
-  console.log(src);
 
   return (
     <>
       {/* {!isFinal && ( */}
       <Rnd
+        bounds="parent"
         default={{
           x: 0,
           y: 0,
-          width: 100,
-          height: 100,
+          width: "100px",
+          height: "100px",
         }}
         style={{
           // overflow: "clip",
@@ -47,8 +46,8 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({
           alignItems: "center",
         }}
         size={{
-          width: `${state.width}px`,
-          height: `${state.height}px`,
+          width: `${state.width}`,
+          height: `${state.height}`,
         }}
         onResizeStop={(e, direction, ref, delta, position) => {
           setState({
@@ -62,6 +61,32 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({
           bottomLeft: "resize-handle-bottom-left",
           topLeft: "resize-handle-top-left",
           topRight: "resize-handle-top-right",
+          bottom: "resize-handle-bottom",
+          top: "resize-handle-top",
+          left: "resize-handle-left",
+          right: "resize-handle-right",
+        }}
+        resizeHandleStyles={{
+          topRight: {
+            width: "15px", // Custom width for the topRight handle
+            height: "15px", // Custom height for the topRight handle
+            borderRadius: "20%",
+          },
+          bottomLeft: {
+            width: "15px", // Custom width for the topRight handle
+            height: "15px", // Custom height for the topRight handle
+            borderRadius: "20%",
+          },
+          bottomRight: {
+            width: "15px", // Custom width for the topRight handle
+            height: "15px", // Custom height for the topRight handle
+            borderRadius: "20%",
+          },
+          topLeft: {
+            width: "15px", // Custom width for the topRight handle
+            height: "15px", // Custom height for the topRight handle
+            borderRadius: "20%",
+          },
         }}
         disableDragging={isEditable}
         enableResizing={!isEditable}
@@ -71,7 +96,7 @@ const ImageOverlay: React.FC<ImageOverlayProps> = ({
           alt="imageOverlay"
           draggable="false"
           style={{
-            width: `${state.width}px`,
+            width: `${state.width}`,
             height: `auto`,
             cursor: "move",
             overflow: "hidden",

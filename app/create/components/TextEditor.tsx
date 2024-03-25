@@ -73,6 +73,8 @@ const TextEditor: React.FC<TextEditorProps> = ({
         background: "#424242",
         borderRadius: 15,
         border: "1px #525252 solid",
+        marginLeft: "20px",
+        marginRight: "20px",
       }}
     >
       {/* color switchers */}
