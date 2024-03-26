@@ -28,21 +28,25 @@ function WalletOption({ onClick }: { onClick: () => void }) {
         gap: 10,
         display: "flex",
         flex: "1",
+        marginLeft: "20px",
+        marginRight: "20px",
+        marginBottom: "16px",
+        cursor: "pointer",
       }}
+      onClick={onClick}
     >
-      <button
+      <label
         style={{
           textAlign: "center",
           color: "white",
           fontSize: 14,
-          // fontFamily: "Public Sans",
           fontWeight: "600",
           wordWrap: "break-word",
         }}
-        onClick={onClick}
+        // onClick={onClick}
       >
         Connect
-      </button>
+      </label>
     </div>
   );
 }

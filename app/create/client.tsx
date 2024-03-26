@@ -839,27 +839,31 @@ export const CreatePost = () => {
                       justifyContent: "center",
                       alignItems: "center",
                       gap: 10,
-                      display: "inline-flex",
+                      display: "flex",
+                      flexDirection: "row",
                       height: "50px",
                       boxSizing: "border-box",
+                      pointerEvents: `${
+                        fileName.length === 0 ? "none" : "visible"
+                      }`,
+                      opacity: fileName.length == 0 ? 0.5 : 1,
+                      cursor: "pointer",
                     }}
+                    onClick={exportMeme}
                   >
                     <img src="base-logo.png" alt="baseLogo" />
 
-                    <button
-                      onClick={exportMeme}
+                    <label
                       style={{
                         textAlign: "center",
                         color: "white",
                         fontSize: 14,
                         fontWeight: "600",
                         wordWrap: "break-word",
-                        height: "50px",
                       }}
-                      disabled={fileName.length === 0}
                     >
                       Mint Meme
-                    </button>
+                    </label>
                   </div>
                 </>
               )}

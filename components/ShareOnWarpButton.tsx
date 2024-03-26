@@ -28,21 +28,21 @@ const ShareWarp = ({ message, url }: { message: string; url: string }) => {
         alignItems: "center",
         gap: 10,
         display: "inline-flex",
+        cursor: "pointer",
       }}
+      onClick={share}
     >
-      <button
+      <label
         style={{
           textAlign: "center",
           color: "white",
           fontSize: 14,
-          // fontFamily: "Public Sans",
           fontWeight: "600",
           wordWrap: "break-word",
         }}
-        onClick={share}
       >
         Share on Warpcast
-      </button>
+      </label>
     </div>
   );
 };

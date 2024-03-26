@@ -145,6 +145,7 @@ const Loader = ({
                 alignItems: "center",
                 gap: 10,
                 display: "inline-flex",
+                cursor: "pointer",
               }}
             >
               <a
