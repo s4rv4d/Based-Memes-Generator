@@ -253,23 +253,24 @@ export const Post = ({ id }: { id: string }) => {
                       alignItems: "center",
                       gap: 10,
                       display: "inline-flex",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      mintEditionNFT();
                     }}
                   >
-                    <button
+                    <label
                       style={{
                         textAlign: "center",
                         color: "#fff",
                         fontSize: 14,
-                        // fontFamily: "Public Sans",
                         fontWeight: "600",
                         wordWrap: "break-word",
-                      }}
-                      onClick={() => {
-                        mintEditionNFT();
+                        cursor: "pointer",
                       }}
                     >
                       Mint
-                    </button>
+                    </label>
                   </div>
                 )}
 
@@ -290,12 +291,13 @@ export const Post = ({ id }: { id: string }) => {
                 <img
                   alt="meme-image"
                   src={parseIpfsUrl(nft.ipfs).gateway}
-                  style={{
-                    width: "auto", // Corresponds to `w-auto`, allowing the element's width to adjust based on its content up to its container's width
-                    maxWidth: "100%", // Corresponds to `max-w-full`, ensuring the element's maximum width does not exceed the width of its container
-                    height: "30rem", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
-                    maxHeight: "80%", // Corresponds to `max-h-full`, ensuring the element's maximum height does not exceed the height of its container
-                  }}
+                  className="max-w-[350px] w-auto h-auto lg:max-h-[550px] lg:max-w-[100%]"
+                  // style={{
+                  //   width: "auto", // Corresponds to `w-auto`, allowing the element's width to adjust based on its content up to its container's width
+                  //   maxWidth: "100%", // Corresponds to `max-w-full`, ensuring the element's maximum width does not exceed the width of its container
+                  //   height: "30rem", // Corresponds to `h-auto`, allowing the element's height to adjust based on its content up to its container's height
+                  //   maxHeight: "80%", // Corresponds to `max-h-full`, ensuring the element's maximum height does not exceed the height of its container
+                  // }}
                 />
               </div>
             </div>

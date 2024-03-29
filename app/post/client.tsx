@@ -339,23 +339,24 @@ export const PostInfo = ({ item }: { item: Nft }) => {
                     alignItems: "center",
                     gap: 10,
                     display: "inline-flex",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    mintEditionNFT();
                   }}
                 >
-                  <button
+                  <label
                     style={{
                       textAlign: "center",
                       color: "#fff",
                       fontSize: 14,
-                      // fontFamily: "Public Sans",
                       fontWeight: "600",
                       wordWrap: "break-word",
-                    }}
-                    onClick={() => {
-                      mintEditionNFT();
+                      cursor: "pointer",
                     }}
                   >
                     Mint
-                  </button>
+                  </label>
                 </div>
               </div>
             )}

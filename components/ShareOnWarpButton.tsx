@@ -39,6 +39,7 @@ const ShareWarp = ({ message, url }: { message: string; url: string }) => {
           fontSize: 14,
           fontWeight: "600",
           wordWrap: "break-word",
+          cursor: "pointer",
         }}
       >
         Share on Warpcast

@@ -158,7 +158,7 @@ export const CreatePost = () => {
         fontName: "Impact",
         fontSize: 20,
         color: "#FFFFFF",
-        strokeColor: "#FFFFFF",
+        strokeColor: "#000000",
       },
     };
     setTexts([...texts, newText]);
@@ -860,6 +860,7 @@ export const CreatePost = () => {
                         fontSize: 14,
                         fontWeight: "600",
                         wordWrap: "break-word",
+                        cursor: "pointer",
                       }}
                     >
                       Mint Meme
