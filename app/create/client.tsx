@@ -735,7 +735,7 @@ export const CreatePost = () => {
                       //   maxWidth: "412px",
                       //   width: "auto",
                       // }}
-                      className="max-w-[412px] w-auto h-auto lg:max-h-[550px] lg:max-w-[100%]"
+                      className="max-w-[390px] w-auto h-auto lg:max-h-[550px] lg:max-w-[100%]"
                       draggable="false"
                       onClick={handleBlur}
                     />

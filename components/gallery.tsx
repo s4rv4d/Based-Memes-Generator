@@ -26,7 +26,6 @@ export default function Gallery() {
     );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let itemsArray: Nft[] = [];
-      console.log(querySnapshot);
       querySnapshot.forEach((doc) => {
         itemsArray.push({ ...doc.data(), id: doc.id });
       });

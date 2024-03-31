@@ -14,7 +14,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
 }) => {
   return (
     <div
-      className="flex overflow-x-auto max-w-[220px] lg:max-w-[800px]  w-auto"
+      className="flex overflow-x-auto max-w-[200px] lg:max-w-[800px]  w-auto"
       // style={{
       //   display: "flex",
       //   overflowX: "auto",
