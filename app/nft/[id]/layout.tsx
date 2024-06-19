@@ -7,6 +7,7 @@ import { Public_Sans } from "next/font/google";
 import { headers } from "next/headers";
 import fetchDoc from "@/utils/fetchDoc";
 import { parseIpfsUrl } from "@/hooks/useZoraCreateEdition";
+import { imageUrl } from "@/utils/render-image";
 
 const inter = Public_Sans({ subsets: ["latin"] });
 
@@ -27,6 +28,61 @@ export async function generateMetadata({
   const nft: Nft = await fetchDoc(params.id);
   const name = nft.fileName;
 
+  const image = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "4px",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <div tw="flex flex-row justify-center items-center mx-2">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "4px",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <img
+            alt="meme-image"
+            src={parseIpfsUrl(nft.ipfs).gateway}
+            tw="w-[200px]"
+          />
+          <span
+            style={{
+              color: "#CDCDD0",
+              fontSize: 10,
+              fontWeight: "400",
+              wordWrap: "break-word",
+            }}
+            className={inter.className}
+          >
+            {nft.fileName ? nft.fileName : "Based Meme"}
+          </span>
+          <span
+            style={{
+              color: "#CDCDD0",
+              fontSize: 10,
+              fontWeight: "400",
+              wordWrap: "break-word",
+            }}
+          >
+            by{" "}
+            {nft.creatorAddress.slice(0, 4) +
+              "...." +
+              nft.creatorAddress.slice(-4)}
+            {/* {` · ${nft.mints ? nft.mints : 0} mints`} */}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+
   const frameMetadata = getFrameMetadata({
     buttons: [
       {
@@ -38,8 +94,8 @@ export async function generateMetadata({
       },
     ],
     image: {
-      src: `${parseIpfsUrl(nft.ipfs).gateway}`,
-      aspectRatio: "1:1",
+      src: `${imageUrl(image)}`,
+      aspectRatio: "1.91:1",
     },
     postUrl: `${String(process.env.NEXT_PUBLIC_HOST_URL)}/api/aftertx?id=${
       params.id

@@ -4,6 +4,7 @@ export const supportedChains = [
   { id: 10, name: "Optimism" },
   { id: 7777777, name: "Zora" },
   { id: 84531, name: "Base Goerli" },
+  { id: 84532, name: "Base Sepolia" },
   { id: 420, name: "Optimism Goerli" },
   { id: 999, name: "Zora Goerli" },
   { id: 5, name: "Goerli" },

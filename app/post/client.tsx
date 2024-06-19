@@ -4,7 +4,7 @@ import { useAccount, useEnsName } from "wagmi";
 import { useEffect } from "react";
 import { parseIpfsUrl } from "@/hooks/useZoraCreateEdition";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { ZoraAbi, getContractFromChainId } from "../../abi/zoraEdition";
+import { PSNFTDropABI, getContractFromChainId } from "../../abi/zoraEdition";
 import Loader from "@/components/loader";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -39,25 +39,28 @@ export const PostInfo = ({ item }: { item: Nft }) => {
 
   const { data: ensName } = useEnsName({ address: nft.creatorAddress });
 
+  // uint256 creatorReward;
+  // uint256 createReferralReward;
+  // uint256 stickerReferralReward;
+  // uint256 mintReferralReward;
+
   const computeEthToSpend = (publicSalePrice: string, numEditions: string) => {
     if (numEditions === "")
       return {
         creatorReward: BigInt(0),
         createReward: BigInt(0),
         mintReferral: BigInt(0),
-        zoraFee: BigInt(0),
-        firstMinterReward: BigInt(0),
         total: BigInt(0),
+        stickerReferral: BigInt(0),
       };
 
     const bigNumEditions = BigInt(numEditions);
 
     // defaults
-    const creatorReward = BigInt("333000000000000") * bigNumEditions;
-    const createReward = BigInt("111000000000000") * bigNumEditions;
-    const mintReferral = BigInt("111000000000000") * bigNumEditions;
-    const zoraFee = BigInt("111000000000000") * bigNumEditions;
-    const firstMinterReward = BigInt("111000000000000") * bigNumEditions;
+    const creatorReward = BigInt("166500000000000") * bigNumEditions;
+    const createReward = BigInt("55500000000000") * bigNumEditions;
+    const mintReferral = BigInt("55500000000000") * bigNumEditions;
+    const stickerReferral = BigInt("55500000000000") * bigNumEditions;
 
     if (publicSalePrice === "0") {
       // free mint
@@ -66,34 +69,22 @@ export const PostInfo = ({ item }: { item: Nft }) => {
         creatorReward,
         createReward,
         mintReferral,
-        zoraFee,
-        firstMinterReward,
-        total:
-          creatorReward +
-          createReward +
-          mintReferral +
-          zoraFee +
-          firstMinterReward,
+        stickerReferral,
+        total: creatorReward + createReward + mintReferral + stickerReferral,
       };
     } else {
       // paid mint
       const editionPrice = BigInt(publicSalePrice) * bigNumEditions;
       const p_createReward = createReward * BigInt(2);
       const p_mintReferral = mintReferral * BigInt(2);
-      const p_zoraFee = zoraFee * BigInt(2);
-      const p_firstMinterReward = firstMinterReward;
+      const p_stickerReferral = stickerReferral * BigInt(2);
       return {
         editionPrice,
         createReward: p_createReward,
         mintReferral: p_mintReferral,
-        zoraFee: p_zoraFee,
-        firstMinterReward,
+        stickerReferral: p_stickerReferral,
         total:
-          editionPrice +
-          p_createReward +
-          p_mintReferral +
-          p_zoraFee +
-          p_firstMinterReward,
+          editionPrice + p_createReward + p_mintReferral + p_stickerReferral,
       };
     }
   };
@@ -104,9 +95,11 @@ export const PostInfo = ({ item }: { item: Nft }) => {
 
     let userAddress = address;
 
+    console.log(computeEthToSpend("0", "1").total.toString());
+
     writeContract({
       address: nft.editionAddress,
-      abi: ZoraAbi,
+      abi: PSNFTDropABI,
       functionName: "mintWithRewards",
       args: [
         userAddress,
@@ -114,7 +107,6 @@ export const PostInfo = ({ item }: { item: Nft }) => {
         "Minting a meme onchain, guess im based :)",
         "0x5371d2E73edf765752121426b842063fbd84f713",
       ],
-      enabled: true,
       value: computeEthToSpend("0", "1").total.toString(),
     });
   };
@@ -206,6 +198,8 @@ export const PostInfo = ({ item }: { item: Nft }) => {
     }
 
     if (isError) {
+      console.log(error);
+
       if (
         error?.message &&
         (error.message.includes("insufficient funds") ||
@@ -224,6 +218,8 @@ export const PostInfo = ({ item }: { item: Nft }) => {
     }
 
     if (isReceiptError) {
+      console.log(reciptError);
+
       if (
         reciptError?.message &&
         (reciptError.message.includes("insufficient funds") ||

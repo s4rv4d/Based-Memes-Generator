@@ -83,6 +83,7 @@ export const CreatePost = () => {
   const [editTitle, setEditTitle] = useState<boolean>(false);
   const [openSticker, setOpenSticker] = useState<boolean>(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [stickerCreators, setStickerCreators] = useState<string[]>([]);
 
   const handleTextEdit = (key: number | undefined) => {
     setActiveView(key);
@@ -179,8 +180,6 @@ export const CreatePost = () => {
         src: reader.result,
       };
 
-      console.log(e.target.files[0]);
-
       setIsFinal(false);
       setIsEditable(false);
       setImages([...images, newImage]);
@@ -239,12 +238,15 @@ export const CreatePost = () => {
     if (dowFinal) {
       if (memeRef.current) {
         html2canvas(document.getElementById("imageWithText"), {
+          logging: true,
           backgroundColor: null,
+          letterRendering: 1,
           useCORS: true,
+          allowTaint: false,
           scale: 1,
         })
           .then(async (canvas) => {
-            const dataURL = canvas.toDataURL();
+            const dataURL = canvas.toDataURL("image/jpeg");
 
             // Create a temporary link element
             const link = document.createElement("a");
@@ -270,8 +272,11 @@ export const CreatePost = () => {
     if (mintFinal) {
       if (memeRef.current) {
         html2canvas(document.getElementById("imageWithText"), {
+          logging: true,
           backgroundColor: null,
+          letterRendering: 1,
           useCORS: true,
+          allowTaint: false,
           scale: 1,
         })
           .then(async (canvas) => {
@@ -306,9 +311,20 @@ export const CreatePost = () => {
   const createEditionNFT = async (ipfsHash: string) => {
     setLoadingText("Creating NFT Edition.......");
 
+    // let test = "0x5371d2E73edf765752121426b842063fbd84f713" as Address;
+    let test: Address[] = [
+      "0x2295C3392C3d264B9fBdf134D618b4cAf52d37a2",
+      "0x4E7B3b80F43BB217aa7Ac630b281E3E464A82809",
+    ];
+
     const args: any = flattenContractArgs(
       generateTokenIdAdjustedContractArgs(
-        createTestZoraEditionConfig(ipfsHash, address as Address),
+        createTestZoraEditionConfig(
+          ipfsHash,
+          address as Address,
+          test
+          // stickerCreators as [Address]
+        ),
         0
       )
     );
@@ -653,15 +669,13 @@ export const CreatePost = () => {
                   <img src="addNewText.svg" alt="text" />
                 </button>
 
-                <input
+                {/* <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
                   style={{ display: "none" }}
                   id="fileInput"
                 />
-
-                {/* Image button for selecting file */}
                 <label
                   htmlFor="fileInput"
                   style={{
@@ -685,11 +699,11 @@ export const CreatePost = () => {
                       maxHeight: "100%",
                     }}
                   />
-                </label>
+                </label> */}
 
                 <div className="flex flex-col gap-2">
                   <StickerModal
-                    onStickerSelection={(sticker: string) => {
+                    onStickerSelection={(sticker: string, creator: string) => {
                       const newImage = {
                         id: images.length + 1,
                         src: sticker,
@@ -698,6 +712,7 @@ export const CreatePost = () => {
                       setIsFinal(false);
                       setIsEditable(false);
                       setImages([...images, newImage]);
+                      setStickerCreators([...stickerCreators, creator]);
                     }}
                   />
                 </div>

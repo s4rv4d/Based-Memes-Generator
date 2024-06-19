@@ -6,7 +6,7 @@ import { db } from "@/app/firebase";
 import { collection, getDocs, onSnapshot, query } from "firebase/firestore";
 
 interface StickerModalType {
-  onStickerSelection: (sticker: string) => void;
+  onStickerSelection: (sticker: string, creator: string) => void;
 }
 
 interface StickerDataType {
@@ -20,12 +20,20 @@ const StickerModal: React.FC<StickerModalType> = ({ onStickerSelection }) => {
   const [open, setOpen] = useState<boolean>(false);
   const filterIcons: string[] = [
     "",
+    "https://dd.dexscreener.com/ds-data/tokens/base/0x0578d8a44db98b23bf096a382e016e29a5ce0ffe.png?size=lg&key=53aa1f",
+    "https://dd.dexscreener.com/ds-data/tokens/base/0x6921b130d297cc43754afba22e5eac0fbf8db75b.png?size=lg&key=c01844",
+    "https://dd.dexscreener.com/ds-data/tokens/base/0x0d97f261b1e88845184f678e2d1e7a98d9fd38de.png?size=lg&key=198b8a",
+    "https://dd.dexscreener.com/ds-data/tokens/base/0xe3086852a4b125803c815a158249ae468a3254ca.png?size=lg&key=df6600",
     "https://dd.dexscreener.com/ds-data/tokens/base/0x7f12d13b34f5f4f0a9449c16bcd42f0da47af200.png?key=025c35",
     "https://dd.dexscreener.com/ds-data/tokens/base/0xf6e932ca12afa26665dc4dde7e27be02a7c02e50.png?size=lg&key=d70034",
     "https://dd.dexscreener.com/ds-data/tokens/base/0xac1bd2486aaf3b5c0fc3fd868558b082a531b2b4.png?size=lg&key=f6836d",
   ];
   const [filters, setFilters] = useState<string[]>([
     "General",
+    "Higher",
+    "Doginme",
+    "TYBG",
+    "MFER",
     "Normie",
     "Mochi",
     "Toshi",
@@ -33,105 +41,6 @@ const StickerModal: React.FC<StickerModalType> = ({ onStickerSelection }) => {
   const [selectedFilter, setSelectedFilter] = useState<string>("General");
   const [stickerArray, setStickerArray] = useState<StickerDataType[]>([]);
   const [updateViewFlag, setUpdateViewFlag] = useState<boolean>(false);
-
-  const newStickerArray: StickerDataType[] = [
-    {
-      community: "random",
-      stickerURL: "stickers/sticker0.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker1.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker2.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker3.svg",
-      verified: true,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker4.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker5.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker6.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker7.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker8.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker9.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker10.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker11.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker12.svg",
-      verified: true,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker13.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker14.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-    {
-      community: "random",
-      stickerURL: "stickers/sticker15.svg",
-      verified: false,
-      creator: "sarvad",
-    },
-  ];
 
   const handleOpen = (e) => {
     setOpen(true);
@@ -216,7 +125,9 @@ const StickerModal: React.FC<StickerModalType> = ({ onStickerSelection }) => {
         >
           <div
             style={{
-              minWidth: "290px",
+              minWidth: "310px",
+              width: "80%",
+              maxWidth: "400px",
               height: "auto",
               background: "#323232",
               borderRadius: 15,
@@ -231,11 +142,14 @@ const StickerModal: React.FC<StickerModalType> = ({ onStickerSelection }) => {
               paddingTop: "24px",
               paddingBottom: "24px",
               maxHeight: "80%",
+              marginLeft: "16px",
+              marginRight: "16px",
             }}
           >
             <div
               style={{
                 width: "100%",
+                // minWidth: "50%",
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-between",
@@ -274,13 +188,16 @@ const StickerModal: React.FC<StickerModalType> = ({ onStickerSelection }) => {
             <div
               style={{
                 display: "flex",
+                maxWidth: "100%",
+                minWidth: "50%",
+                width: "auto",
                 flexDirection: "row",
                 justifyContent: "start",
                 alignItems: "center",
                 gap: "10px",
-                width: "auto",
                 overflowX: "auto",
-                height: "65px",
+                height: "30%",
+                objectFit: "fill",
               }}
             >
               {filters.map((filter, index) => (
@@ -336,7 +253,10 @@ const StickerModal: React.FC<StickerModalType> = ({ onStickerSelection }) => {
                 <div
                   key={index}
                   onClick={() => {
-                    onStickerSelection(stickerData.stickerURL);
+                    onStickerSelection(
+                      stickerData.stickerURL,
+                      stickerData.creator
+                    );
                     setOpen(false);
                   }}
                   style={{

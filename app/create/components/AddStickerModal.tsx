@@ -67,9 +67,13 @@ const AddStickerModal = ({ updateFlag }) => {
 
   const dropdownVals: DropdownType[] = [
     { id: 1, field: "General" },
-    { id: 2, field: "Toshi" },
-    { id: 3, field: "Mochi" },
-    { id: 4, field: "Normie" },
+    { id: 2, field: "Higher" },
+    { id: 3, field: "Doginme" },
+    { id: 4, field: "TYBG" },
+    { id: 5, field: "MFER" },
+    { id: 6, field: "Normie" },
+    { id: 7, field: "Toshi" },
+    { id: 8, field: "Mochi" },
   ];
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -103,7 +107,17 @@ const AddStickerModal = ({ updateFlag }) => {
                 key={option[props.valueField]}
                 onClick={option.disabled ? null : () => methods.addItem(option)}
               >
-                <div>{option[props.labelField]}</div>
+                <div
+                  style={{
+                    color: "white",
+                    fontSize: 12,
+                    fontFamily: "Inter",
+                    fontWeight: "200",
+                    wordWrap: "break-word",
+                  }}
+                >
+                  {option[props.labelField]}
+                </div>
               </div>
             );
           })}
@@ -161,7 +175,7 @@ const AddStickerModal = ({ updateFlag }) => {
         community: dropValue[0].field,
         stickerURL: imageURL,
         verified: false,
-        creator: "sarvad",
+        creator: "0x2295C3392C3d264B9fBdf134D618b4cAf52d37a2",
       }
     );
     return res.id;
@@ -259,6 +273,7 @@ const AddStickerModal = ({ updateFlag }) => {
                 border: "1px #525252 solid",
                 background: "#323232",
                 borderRadius: 8,
+                color: "white",
               }}
               dropdownRenderer={(innerProps, innerState, innerMethods) =>
                 dropdownRenderer(innerProps, innerState, innerMethods)

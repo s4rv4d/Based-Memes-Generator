@@ -5,16 +5,22 @@ import Footer from "@/components/footer";
 import Gallery from "@/components/gallery";
 import { useState, useEffect } from "react";
 import Page from "./create/page";
+import PageGIF from "./createGif/page";
 
 export default function Home() {
   const [showCreate, setShowCreate] = useState(false);
+  const [showCreateGIF, setShowCreateGIF] = useState(false);
 
   const showCreateView = () => {
     setShowCreate((prevShowCreate) => !prevShowCreate);
   };
 
+  const showCreateGifView = () => {
+    setShowCreateGIF((prev) => !prev);
+  };
+
   useEffect(() => {
-    if (showCreate) {
+    if (showCreate || showCreateGIF) {
       // Prevent scrolling on mount
       document.body.style.overflow = "hidden";
     } else {
@@ -25,11 +31,12 @@ export default function Home() {
     return () => {
       document.body.style.overflow = "auto";
     };
-  }, [showCreate]);
+  }, [showCreate, showCreateGIF]);
 
   // Function to close the modal when the overlay is clicked
   const handleOverlayClick = () => {
     setShowCreate(false);
+    setShowCreateGIF(false);
   };
 
   // Function to stop the click event from bubbling up to the overlay
@@ -47,29 +54,32 @@ export default function Home() {
       >
         <div className="bg-custom-black bg-gradient-to-r from-custom-blue via-custom-black to-custom-black">
           <Header />
-          <Hero showCreateView={showCreateView} />
+          <Hero
+            showCreateView={showCreateView}
+            showCreateGIF={showCreateGifView}
+          />
         </div>
         <Gallery />
         <Footer />
       </main>
       {showCreate && (
         <div
-          style={{
-            position: "fixed", // or 'absolute' depending on your needs
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            background: "rgba(0, 0, 0, 0.8)", // Example semi-transparent background
-            zIndex: 1000, // High z-index to overlay on top of everything
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+          className="fixed inset-y-0 w-full h-full bg-overlay-background z-50 flex justify-center items-center"
           onClick={handleOverlayClick}
         >
           <div onClick={handleModalClick}>
             <Page />
+          </div>
+        </div>
+      )}
+
+      {showCreateGIF && (
+        <div
+          className="fixed inset-y-0 w-full h-full bg-overlay-background z-50 flex justify-center items-center"
+          onClick={handleOverlayClick}
+        >
+          <div onClick={handleModalClick}>
+            <PageGIF />
           </div>
         </div>
       )}

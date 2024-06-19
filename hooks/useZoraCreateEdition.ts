@@ -24,6 +24,7 @@ export const EditionConfig = z.object({
   animationURI: z.string(),
   imageURI: z.string(),
   referrer: z.string(),
+  stickerCreators: z.array(z.string().min(2)),
 });
 
 export const ZoraEdition = z.object({
@@ -196,6 +197,7 @@ export const ConfigurableZoraEditionSchema = z
     animationURI: z.string(),
     imageURI: z.string(),
     saleConfig: EditionSaleConfigSchema,
+    stickerCreators: z.array(z.string().min(2)),
   })
   .transform((val, ctx) => {
     if (val.animationURI && !val.imageURI) {
@@ -236,7 +238,8 @@ export const ConfigurableZoraEditionSchema = z
       description: val.description,
       animationURI: parseIpfsUrl(val.animationURI).raw,
       imageURI: parseIpfsUrl(val.imageURI).raw,
-      referrer: "0x5371d2E73edf765752121426b842063fbd84f713",
+      referrer: "0x318c64a20bf165d9541Cf8C14E3b659Cd7F7A916",
+      stickerCreators: val.stickerCreators,
     };
 
     return output;
@@ -281,7 +284,8 @@ export const generateTokenIdAdjustedContractArgs = (
 
 export function createTestZoraEditionConfig(
   ipfsHash: string,
-  creatorAddress: Address
+  creatorAddress: Address,
+  stickerCreators: Address[]
 ): ConfigurableZoraEditionOutput | null {
   // Example test data object
   const testData = {
@@ -298,6 +302,7 @@ export function createTestZoraEditionConfig(
       publicSaleStart: "now",
       publicSaleEnd: "forever",
     },
+    stickerCreators: stickerCreators,
   };
 
   // Validate and transform the test data using ConfigurableZoraEditionSchema

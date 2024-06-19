@@ -43,6 +43,7 @@ class SketchExample extends React.Component {
         popover: {
           position: "absolute",
           zIndex: "2",
+          bottom: "50px",
         },
         cover: {
           position: "fixed",
@@ -56,9 +57,6 @@ class SketchExample extends React.Component {
 
     return (
       <div>
-        <div style={styles.swatch} onClick={this.handleClick}>
-          <div style={styles.color} />
-        </div>
         {this.state.displayColorPicker ? (
           <div style={styles.popover}>
             <div style={styles.cover} onClick={this.handleClose} />
@@ -68,6 +66,9 @@ class SketchExample extends React.Component {
             />
           </div>
         ) : null}
+        <div style={styles.swatch} onClick={this.handleClick}>
+          <div style={styles.color} />
+        </div>
       </div>
     );
   }

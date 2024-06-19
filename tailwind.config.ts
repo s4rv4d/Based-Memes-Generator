@@ -21,6 +21,8 @@ const config: Config = {
         "create-form-bg": "#323232",
         "new-create-bg": "#525252",
         "custom-blue": "#125EFF",
+        "primary-button": "#0252FF",
+        "overlay-background": "rgba(0, 0, 0, 0.8)",
       },
     },
   },

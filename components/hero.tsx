@@ -1,11 +1,12 @@
 "use client";
 import React from "react";
-import Link from "next/link";
 
 export default function Hero({
   showCreateView,
+  showCreateGIF,
 }: {
   showCreateView: () => void;
+  showCreateGIF: () => void;
 }) {
   return (
     <section className="text-gray-600 body-font">
@@ -44,7 +45,7 @@ export default function Hero({
               Create memes, earn ETH, climb the corporate ladder
             </p>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-4">
             <div
               style={{
                 width: "252px",
@@ -76,6 +77,16 @@ export default function Hero({
                 }}
               >
                 Choose Meme Template
+              </button>
+            </div>
+
+            <div className="w-[252px] h-[48px] px-[32px] bg-primary-button rounded-[30px] flex justify-center items-center">
+              <button
+                className="text-center text-white text-base font-medium leading-6 break-normal"
+                draggable={false}
+                onClick={showCreateGIF}
+              >
+                Create Meme GIF
               </button>
             </div>
           </div>
