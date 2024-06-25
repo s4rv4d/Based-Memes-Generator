@@ -311,19 +311,12 @@ export const CreatePost = () => {
   const createEditionNFT = async (ipfsHash: string) => {
     setLoadingText("Creating NFT Edition.......");
 
-    // let test = "0x5371d2E73edf765752121426b842063fbd84f713" as Address;
-    let test: Address[] = [
-      "0x2295C3392C3d264B9fBdf134D618b4cAf52d37a2",
-      "0x4E7B3b80F43BB217aa7Ac630b281E3E464A82809",
-    ];
-
     const args: any = flattenContractArgs(
       generateTokenIdAdjustedContractArgs(
         createTestZoraEditionConfig(
           ipfsHash,
           address as Address,
-          test
-          // stickerCreators as [Address]
+          stickerCreators as [Address]
         ),
         0
       )

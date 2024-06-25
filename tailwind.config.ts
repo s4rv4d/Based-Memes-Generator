@@ -14,6 +14,7 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "radial-at-tl": `radial-gradient(at top left, #03FF7080, #DC80FC00, transparent)`,
         "radial-at-br": `radial-gradient(at bottom right, ##03FF7080, #DC80FC00, transparent)`,
+        "card-background": "linear-gradient(108deg, #2E2E2E 0%, #1F1F1F 100%)",
       },
       colors: {
         "custom-green": "#03FF7080",
@@ -23,6 +24,10 @@ const config: Config = {
         "custom-blue": "#125EFF",
         "primary-button": "#0252FF",
         "overlay-background": "rgba(0, 0, 0, 0.8)",
+        "primary-border-color": "#525252",
+      },
+      boxShadow: {
+        "custom-box-shadow": "0px 3px 3px rgba(0, 0, 0, 0.16)",
       },
     },
   },
