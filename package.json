@@ -17,11 +17,12 @@
     "@pinata/sdk": "^2.1.0",
     "@syncfusion/ej2-image-editor": "^24.2.5",
     "@tanstack/react-query": "^5.18.1",
+    "@techstark/opencv-js": "^4.9.0-release.3",
     "@types/file-saver": "^2.0.7",
     "@types/react-color": "^3.0.12",
     "@types/react-numeric-input": "^2.2.7",
     "@vercel/og": "^0.6.2",
-    "@web3modal/wagmi": "^4.2.0",
+    "@web3modal/wagmi": "^5.0.3",
     "decimal.js": "^10.4.3",
     "face-api.js": "^0.22.2",
     "file-saver": "^2.0.5",
@@ -64,8 +65,5 @@
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
-  },
-  "overrides": {
-    "@coinbase/wallet-sdk": "npm:@coinbase/wallet-sdk@4.0.0-beta.12"
   }
 }

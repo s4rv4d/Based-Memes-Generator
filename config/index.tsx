@@ -7,27 +7,45 @@ export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_ID;
 
 if (!projectId) throw new Error("Project ID is not defined");
 
-export const config = createConfig({
-  chains: [baseSepolia],
-  connectors: [
-    injected(),
-    walletConnect({
-      projectId: projectId,
-      showQrModal: false,
-    }),
-    coinbaseWallet({
-      appName: "Based Memes",
-      appChainIds: [baseSepolia.id],
-    }),
-  ],
+// export const config = createConfig({
+//   chains: [baseSepolia],
+//   connectors: [
+//     injected(),
+//     walletConnect({
+//       projectId: projectId,
+//       showQrModal: false,
+//     }),
+//     coinbaseWallet({
+//       appName: "Based Memes",
+//       appChainIds: [baseSepolia.id],
+//     }),
+//   ],
+//   ssr: true,
+//   storage: createStorage({
+//     storage: cookieStorage,
+//   }),
+//   transports: {
+//     // [goerli.id]: http(),
+//     [baseSepolia.id]: http(),
+//   },
+// });
+
+const metadata = {
+  name: "Based Memes",
+  description: "Onchain Meme generator",
+  url: "https://www.basedmemes.xyz",
+  icons: ["https://avatars.githubusercontent.com/u/37784886"],
+};
+
+const chains = [base, baseSepolia] as const;
+export const config = defaultWagmiConfig({
+  chains,
+  projectId,
+  metadata,
   ssr: true,
   storage: createStorage({
     storage: cookieStorage,
   }),
-  transports: {
-    // [goerli.id]: http(),
-    [baseSepolia.id]: http(),
-  },
 });
 
 // const metadata = {

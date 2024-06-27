@@ -2,8 +2,11 @@
 const nextConfig = {
   webpack: (config) => {
     config.externals.push("pino-pretty", "lokijs", "encoding");
+    config.resolve.fallback = { fs: false, path: false, crypto: false };
     return config;
   },
+
+  reactStrictMode: false,
 
   eslint: {
     // Warning: This allows production builds to successfully complete even if

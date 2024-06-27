@@ -1,40 +1,25 @@
+"use client";
 import { Mat, Rect } from "opencv-ts";
 import * as faceapi from "face-api.js";
 import GIF from "gif.js";
 import { parseGIF, decompressFrames, ParsedFrame, Frame } from "gifuct-js";
 import dynamic from "next/dynamic";
+import useOpenCVLoader from "../hooks/useOpenCVLoader";
+import { useEffect, useState } from "react";
+import cv from "@techstark/opencv-js";
 
-// helpers/loadOpenCV.js
-let isInitialized = false;
-let initPromise: Promise<void> | null = null;
+export const useOpenCV = () => {
+  const isOpenCVLoaded = useOpenCVLoader();
+  const [cv, setCv] = useState<any>(null);
 
-export const initializeOpenCV = async (): Promise<void> => {
-  if (isInitialized) return;
+  useEffect(() => {
+    if (isOpenCVLoaded && window.cv) {
+      setCv(window.cv);
+      console.log("loaded");
+    }
+  }, [isOpenCVLoaded]);
 
-  if (!initPromise) {
-    initPromise = new Promise(async (resolve, reject) => {
-      try {
-        const cv = await import("opencv-ts");
-        cv.default.onRuntimeInitialized = () => {
-          isInitialized = true;
-          resolve();
-        };
-      } catch (error) {
-        reject(new Error("Failed to load OpenCV.js"));
-      }
-    });
-  }
-
-  await initPromise;
-};
-
-export const usageOpenCV = async (): Promise<typeof import("opencv-ts")> => {
-  if (typeof window === "undefined") {
-    throw new Error("useOpenCV can only be used in the browser");
-  }
-
-  await initializeOpenCV();
-  return import("opencv-ts");
+  return cv;
 };
 
 interface Position {
@@ -211,10 +196,10 @@ export const getCount = async (gifBuffer: ArrayBuffer): Promise<number> => {
 
 export const processGif = async (
   gifBuffer: ArrayBuffer,
-  overlayImages: HTMLImageElement[]
-): Promise<string | undefined> => {
-  await initializeOpenCV();
-  const cvModule = await usageOpenCV().then((module) => module.default);
+  overlayImages: HTMLImageElement[],
+  cv: any
+): Promise<{ gifUrl: string; blob: Blob } | undefined> => {
+  const cvModule = cv;
 
   const gif = parseGIF(gifBuffer);
 
@@ -288,11 +273,12 @@ export const processGif = async (
     index++;
   }
 
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<{ gifUrl: string; blob: Blob }>((resolve, reject) => {
     gifWriter.on("finished", (blob: Blob) => {
       const gifUrl = URL.createObjectURL(blob);
 
-      resolve(gifUrl);
+      // resolve(gifUrl);
+      resolve({ gifUrl, blob });
     });
     gifWriter.on("abort", () => {
       console.log(`error: ${reject}`);
