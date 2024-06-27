@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Connector, useConnect } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { injected, coinbaseWallet } from "wagmi/connectors";
 import { Public_Sans } from "next/font/google";
 
 const inter = Public_Sans({ subsets: ["latin"] });
@@ -8,7 +8,9 @@ const inter = Public_Sans({ subsets: ["latin"] });
 export function WalletOptions() {
   const { connectors, connect } = useConnect();
 
-  return <WalletOption onClick={() => connect({ connector: injected() })} />;
+  return (
+    <WalletOption onClick={() => connect({ connector: coinbaseWallet() })} />
+  );
 }
 
 function WalletOption({ onClick }: { onClick: () => void }) {

@@ -208,7 +208,7 @@ export const processGif = async (
     quality: 10,
     width: gif.lsd.width,
     height: gif.lsd.height,
-    debug: false,
+    debug: true,
   });
 
   gifCanvas.width = gif.lsd.width;
@@ -281,6 +281,7 @@ export const processGif = async (
       resolve({ gifUrl, blob });
     });
     gifWriter.on("abort", () => {
+      reject("failed to render gif");
       console.log(`error: ${reject}`);
     });
     gifWriter.render();

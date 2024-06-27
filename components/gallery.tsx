@@ -19,7 +19,7 @@ export default function Gallery() {
   const [nfts, setNfts] = useState<Nft[]>([]);
   const [showPost, setShowPost] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Nft | null>(null);
-
+  // TODO: FILTER ORDER
   useEffect(() => {
     const q = query(
       collection(db, String(process.env.NEXT_PUBLIC_FIRESTIRE_ENDPOINT))

@@ -51,7 +51,7 @@ export default function Header() {
     <header className="text-black bg-transparent body-font">
       <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center justify-between">
         <a className="flex font-medium items-center text-white mb-4 md:mb-0">
-          <span className="ml-3 text-xl">Based Memes</span>
+          <span className="text-xl">Based Memes</span>
         </a>
         <div className="inline-flex items-center text-base mt-4 md:mt-0">
           <w3m-button />
@@ -59,7 +59,7 @@ export default function Header() {
             onClick={handleClick}
             className="flex items-center ml-4 text-white bg-[#0252FF] rounded-full p-1 px-2"
           >
-            <span className="ml-2">Rewards: {formattedBalance}</span>
+            <span className="m-1">Rewards: {formattedBalance}</span>
           </button>
         </div>
       </div>
